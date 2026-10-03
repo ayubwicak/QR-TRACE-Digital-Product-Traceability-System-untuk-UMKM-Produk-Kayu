@@ -7,7 +7,7 @@ dotenv.config();
 const { Pool } = pg;
 
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://kwas:admin1234@localhost:5432/kwas',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/qrtrace',
   ssl: false
 });
 
