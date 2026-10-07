@@ -1,6 +1,6 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Award, Printer, X, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Award, Printer, X, CheckCircle2 } from 'lucide-react';
 
 export default function CertificateModal({ isOpen, onClose, batch }) {
   if (!isOpen || !batch) return null;

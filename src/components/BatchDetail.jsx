@@ -9,16 +9,13 @@ import {
   Factory, 
   CheckCircle2, 
   Printer, 
-  Hash, 
   Edit3, 
   Trash2, 
   Award, 
   Download, 
-  QrCode,
-  ArrowLeft,
-  MapPin,
-  FileCheck2,
-  Share2
+  QrCode, 
+  ArrowLeft, 
+  MapPin
 } from 'lucide-react';
 import AiCopilotCard from './AiCopilotCard';
 

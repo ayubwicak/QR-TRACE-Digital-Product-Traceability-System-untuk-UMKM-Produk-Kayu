@@ -5,10 +5,7 @@ import {
   Calendar, 
   Layers, 
   X, 
-  Copy, 
-  Check, 
-  Sparkles,
-  Tag
+  Copy
 } from 'lucide-react';
 
 export default function BatchList({ 

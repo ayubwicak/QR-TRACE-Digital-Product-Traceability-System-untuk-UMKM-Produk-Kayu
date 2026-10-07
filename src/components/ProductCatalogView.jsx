@@ -6,18 +6,17 @@ import {
   List, 
   CheckCircle2, 
   Calendar, 
-  MapPin, 
   Leaf, 
   Printer, 
   ArrowRight, 
   Edit3, 
   Trash2, 
   ShieldCheck, 
-  SlidersHorizontal,
-  Package,
-  QrCode
+  Package, 
+  QrCode,
+  Download
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { api } from '../api';
 
 export default function ProductCatalogView({
   batches,
@@ -33,8 +32,29 @@ export default function ProductCatalogView({
   setCategoryFilter
 }) {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
+  const [isExporting, setIsExporting] = useState(false);
 
   const categories = ['Semua', 'F&B / Agrikultur', 'Personal Care & Herbal', 'Nutraceutical / Superfood', 'Teknologi & Elektronik'];
+
+  const handleExportCsv = async () => {
+    setIsExporting(true);
+    try {
+      await api.exportBatchesCSV();
+    } catch (_err) {
+      // Fallback export jika offline
+      const headers = ['Nomor Batch,Nama Produk,Brand,SKU,Kategori,Tgl Rilis,Kadaluarsa,Skor QC,Status QC,Pemeriksa,Jejak Karbon'];
+      const rows = batches.map(b => `"${b.batchNumber}","${b.productName}","${b.brand}","${b.sku}","${b.category}","${b.manufactureDate}","${b.expiryDate}",${b.qcScore},"${b.qcStatus}","${b.qcInspector}","${b.carbonFootprint}"`);
+      const csv = [headers, ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `laporan-batches-${Date.now()}.csv`;
+      a.click();
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const filtered = batches.filter(b => {
     const matchesSearch = 
@@ -97,8 +117,18 @@ export default function ProductCatalogView({
             />
           </div>
 
-          {/* View Mode Toggle (Grid vs Table) */}
-          <div className="flex items-center gap-2 self-end sm:self-center">
+          {/* View Mode Toggle & CSV Export */}
+          <div className="flex items-center gap-2.5 self-end sm:self-center">
+            <button
+              onClick={handleExportCsv}
+              disabled={isExporting}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
+              title="Unduh Laporan Audit Data Batch (CSV)"
+            >
+              <Download className="w-3.5 h-3.5 text-teal-600" />
+              <span className="hidden sm:inline">{isExporting ? 'Mengunduh...' : 'Ekspor CSV'}</span>
+            </button>
+
             <span className="text-xs text-slate-500 font-medium hidden sm:inline">Tampilan:</span>
             <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
               <button

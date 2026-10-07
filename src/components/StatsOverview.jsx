@@ -11,9 +11,9 @@ import {
 
 export default function StatsOverview({ batches, auditLogs }) {
   const totalBatches = batches.length;
-  const passedQcCount = batches.filter(b => b.qcStatus && b.qcStatus.includes('Passed')).length;
+  const passedQcCount = batches.filter(b => (b.qcScore && b.qcScore >= 90) || (b.qcStatus && (b.qcStatus.includes('Lolos') || b.qcStatus.includes('Passed')))).length;
   const avgQcScore = totalBatches > 0 
-    ? (batches.reduce((acc, b) => acc + (b.qcScore || 98), 0) / totalBatches).toFixed(1)
+    ? (batches.reduce((acc, b) => acc + (parseFloat(b.qcScore) || 98), 0) / totalBatches).toFixed(1)
     : '100';
   const totalLogs = auditLogs.length;
 

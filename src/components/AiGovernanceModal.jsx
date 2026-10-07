@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, 
-  X, 
-  Lock, 
-  CheckCircle2, 
-  Sparkles,
-  Sliders
+  X
 } from 'lucide-react';
 import { AI_GOVERNANCE_RULES } from '../data/mockData';
 
