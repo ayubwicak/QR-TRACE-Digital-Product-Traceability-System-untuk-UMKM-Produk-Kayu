@@ -173,6 +173,7 @@ export async function initDb() {
         carbon_rating VARCHAR(50) NOT NULL,
         verification_hash VARCHAR(255) NOT NULL,
         story TEXT,
+        image TEXT NOT NULL DEFAULT '',
         materials JSONB NOT NULL DEFAULT '[]'::jsonb,
         timeline JSONB NOT NULL DEFAULT '[]'::jsonb,
         ai_analysis JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -180,6 +181,7 @@ export async function initDb() {
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    await client.query(`ALTER TABLE qrtrace.batches ADD COLUMN IF NOT EXISTS image TEXT NOT NULL DEFAULT '';`);
 
     // 4. Buat Tabel Audit Logs
     await client.query(`
@@ -267,13 +269,13 @@ export async function initDb() {
             batch_number, product_name, brand, sku, category,
             manufacture_date, expiry_date, qc_status, qc_score,
             qc_inspector, carbon_footprint, carbon_rating,
-            verification_hash, story, materials, timeline, ai_analysis
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);
+            verification_hash, story, image, materials, timeline, ai_analysis
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18);
         `, [
           b.batchNumber, b.productName, b.brand, b.sku, b.category,
           b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
           b.qcInspector, b.carbonFootprint, b.carbonRating,
-          b.verificationHash, b.story, JSON.stringify(b.materials),
+          b.verificationHash, b.story, b.image || '', JSON.stringify(b.materials),
           JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis)
         ]);
       }
@@ -282,7 +284,9 @@ export async function initDb() {
     const legacySampleNames = [
       'Kopi Robusta Temerloh Organik 250g',
       'Sabun Herbal Minyak Atsiri Serai 100g',
-      'Madu Kelulut Asli Hutan Tropis 350g'
+      'Madu Kelulut Asli Hutan Tropis 350g',
+      'Kripik',
+      'Pisang'
     ];
 
     for (const b of INITIAL_BATCHES) {
@@ -291,17 +295,27 @@ export async function initDb() {
         SET product_name = $2, brand = $3, sku = $4, category = $5,
             manufacture_date = $6, expiry_date = $7, qc_status = $8, qc_score = $9,
             qc_inspector = $10, carbon_footprint = $11, carbon_rating = $12,
-            verification_hash = $13, story = $14, materials = $15,
-            timeline = $16, ai_analysis = $17
-        WHERE batch_number = $1 AND product_name = ANY($18::text[]);
+            verification_hash = $13, story = $14, image = $15, materials = $16,
+            timeline = $17, ai_analysis = $18
+        WHERE batch_number = $1 AND (product_name = ANY($19::text[]) OR product_name = $2);
       `, [
         b.batchNumber, b.productName, b.brand, b.sku, b.category,
         b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
         b.qcInspector, b.carbonFootprint, b.carbonRating,
-        b.verificationHash, b.story, JSON.stringify(b.materials),
+        b.verificationHash, b.story, b.image || '', JSON.stringify(b.materials),
         JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis), legacySampleNames
       ]);
     }
+
+    await client.query(`
+      DELETE FROM qrtrace.batches
+      WHERE (batch_number = 'BATCH-2026-N04' AND product_name = 'Kripik')
+         OR (batch_number = 'BATCH-2026-N05' AND product_name = 'Pisang');
+    `);
+    await client.query(`
+      DELETE FROM qrtrace.scan_events
+      WHERE batch_number = ANY($1::text[]);
+    `, [['BATCH-2026-N04', 'BATCH-2026-N05']]);
 
     for (const b of ADDITIONAL_WOOD_BATCHES) {
       await client.query(`
@@ -309,14 +323,17 @@ export async function initDb() {
           batch_number, product_name, brand, sku, category,
           manufacture_date, expiry_date, qc_status, qc_score,
           qc_inspector, carbon_footprint, carbon_rating,
-          verification_hash, story, materials, timeline, ai_analysis
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-        ON CONFLICT (batch_number) DO NOTHING;
+          verification_hash, story, image, materials, timeline, ai_analysis
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        ON CONFLICT (batch_number) DO UPDATE
+        SET image = EXCLUDED.image
+        WHERE qrtrace.batches.product_name = EXCLUDED.product_name
+          AND (qrtrace.batches.image IS NULL OR qrtrace.batches.image = '');
       `, [
         b.batchNumber, b.productName, b.brand, b.sku, b.category,
         b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
         b.qcInspector, b.carbonFootprint, b.carbonRating,
-        b.verificationHash, b.story, JSON.stringify(b.materials),
+        b.verificationHash, b.story, b.image || '', JSON.stringify(b.materials),
         JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis)
       ]);
     }

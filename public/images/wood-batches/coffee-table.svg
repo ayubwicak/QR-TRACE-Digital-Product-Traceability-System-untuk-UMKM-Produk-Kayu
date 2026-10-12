@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#f4eee2"/><stop offset="1" stop-color="#e6d6bf"/></linearGradient>
+    <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#b8793e"/><stop offset="1" stop-color="#754323"/></linearGradient>
+    <linearGradient id="top" x2="0" y2="1"><stop stop-color="#d39a60"/><stop offset="1" stop-color="#a96735"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="790" cy="90" r="160" fill="#fff" opacity=".28"/>
+  <path fill="#bda78c" opacity=".45" d="M120 417h720v20H120z"/>
+  <path fill="url(#wood)" d="M298 286h34v147h-34zm327 0h34v147h-34z"/>
+  <path fill="url(#top)" stroke="#754323" stroke-width="8" d="m194 250 84-62h412l82 62-82 62H278z"/>
+  <path fill="#e0ad75" opacity=".7" d="m250 250 51-39h369l55 39-55 40H301z"/>
+  <path d="M327 232c74-13 188-13 269 1M341 250c95-10 167-10 249 0" fill="none" stroke="#9b6034" stroke-width="5" opacity=".55"/>
+  <path fill="#744522" opacity=".25" d="m194 250 84 62h412l82-62-82 48H278z"/>
+</svg>

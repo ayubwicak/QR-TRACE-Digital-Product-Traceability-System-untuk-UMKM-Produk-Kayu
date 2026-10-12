@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#f5efe5"/><stop offset="1" stop-color="#e5d6c3"/></linearGradient>
+    <linearGradient id="wood" x2="1" y2="1"><stop stop-color="#bd8050"/><stop offset="1" stop-color="#70432b"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="180" cy="90" r="130" fill="#fff" opacity=".3"/>
+  <path fill="#b8a28a" opacity=".4" d="M150 430h660v18H150z"/>
+  <path fill="url(#wood)" stroke="#69402a" stroke-width="8" d="M340 128q0-28 28-28h224q28 0 28 28v166h-42V146H382v148h-42z"/>
+  <path fill="#d69b66" d="M385 151h190v119H385z"/>
+  <path fill="url(#wood)" stroke="#69402a" stroke-width="8" d="m315 284 49-24h234l49 24-23 72H338z"/>
+  <path fill="#8b5734" d="m349 349 35 3-16 91h-37zm235 0-35 3 16 91h37z"/>
+  <path fill="none" stroke="#e6b67f" stroke-width="5" d="M413 168h130M414 187h126M414 207h126"/>
+  <path fill="none" stroke="#e7bd91" stroke-width="5" d="M383 304c65 10 130 10 196 0"/>
+</svg>

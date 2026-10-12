@@ -18,6 +18,7 @@ import {
   MapPin
 } from 'lucide-react';
 import AiCopilotCard from './AiCopilotCard';
+import { getBatchPassportUrl } from '../utils/passport';
 
 export default function BatchDetail({ 
   batch, 
@@ -103,7 +104,7 @@ export default function BatchDetail({
           {/* Product Image & Badges (5 Col) */}
           <div className="lg:col-span-5 relative rounded-2xl overflow-hidden bg-slate-100 h-56 sm:h-64 border border-slate-200">
             <img 
-              src={batch.image || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80'} 
+              src={batch.image || '/images/wood-batches/coffee-table.svg'}
               alt={batch.productName}
               className="w-full h-full object-cover"
             />
@@ -142,7 +143,7 @@ export default function BatchDetail({
               <div className="flex items-center gap-3.5">
                 <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-2xs">
                   <QRCodeSVG 
-                    value={`https://qrtrace.app/verify/${batch.batchNumber}`}
+                    value={getBatchPassportUrl(batch.batchNumber)}
                     size={72}
                     bgColor="#ffffff"
                     fgColor="#000000"
@@ -164,7 +165,7 @@ export default function BatchDetail({
                 </button>
                 <button
                   onClick={() => onSimulateScan(batch)}
-                  className="flex-1 sm:flex-none px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-xs flex items-center justify-center gap-1.5 shadow-xs"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-xs flex items-center justify-center gap-1.5 shadow-xs lg:hidden"
                 >
                   <QrCode className="w-3.5 h-3.5 text-white" /> Buka Paspor HP
                 </button>

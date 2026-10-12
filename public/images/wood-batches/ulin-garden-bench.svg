@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#e9eee1"/><stop offset="1" stop-color="#cfd8c1"/></linearGradient>
+    <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#a86d40"/><stop offset="1" stop-color="#684329"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="180" cy="95" r="110" fill="#fff" opacity=".25"/>
+  <path fill="#88977c" opacity=".35" d="M130 415h700v35H130z"/>
+  <path fill="#718761" d="M130 417c55-130 112-137 171 0m333 0c50-116 108-126 195 0"/>
+  <path fill="url(#wood)" stroke="#5c3b28" stroke-width="8" d="M283 230h395v37H283zm0 57h395v37H283zm0 57h395v37H283z"/>
+  <path fill="#794c30" stroke="#5c3b28" stroke-width="8" d="M319 205h38v186h-38zm307 0h38v186h-38z"/>
+  <path fill="#885733" d="m330 370 28 6-23 74h-34zm310 0-28 6 23 74h34z"/>
+  <path fill="none" stroke="#d09a62" stroke-width="5" d="M304 249h353m-353 57h353m-353 57h353"/>
+  <path fill="#fff" opacity=".18" d="M0 390h960v150H0z"/>
+</svg>

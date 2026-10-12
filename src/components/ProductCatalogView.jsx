@@ -192,7 +192,7 @@ export default function ProductCatalogView({
                 {/* Photo with Overlay Badges */}
                 <div className="relative h-40 overflow-hidden bg-slate-100 dark:bg-slate-800">
                   <img 
-                    src={b.image || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80'} 
+                    src={b.image || '/images/wood-batches/coffee-table.svg'}
                     alt={b.productName}
                     className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                   />
@@ -303,7 +303,7 @@ export default function ProductCatalogView({
                     <td className="p-3.5 pl-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={b.image || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80'}
+                          src={b.image || '/images/wood-batches/coffee-table.svg'}
                           alt={b.productName}
                           className="h-10 w-10 rounded-xl border border-slate-200 object-cover dark:border-slate-700"
                         />

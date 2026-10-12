@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#f2ede3"/><stop offset="1" stop-color="#dfd0bb"/></linearGradient>
+    <linearGradient id="wood" x2="1" y2="1"><stop stop-color="#d99c55"/><stop offset="1" stop-color="#9a5c2c"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="760" cy="105" r="155" fill="#fff" opacity=".34"/>
+  <ellipse cx="480" cy="405" rx="260" ry="34" fill="#8c6749" opacity=".2"/>
+  <path fill="url(#wood)" stroke="#754520" stroke-width="10" d="M348 113h264q30 0 30 30v224q0 42-42 42H360q-42 0-42-42V143q0-30 30-30z"/>
+  <path fill="#e6b976" opacity=".45" d="M367 145h227v225q0 17-17 17H367z"/>
+  <path d="M382 177c55 22 115 20 189-3M381 211c68 20 128 16 194-5M380 251c51 14 128 14 198-3M381 293c60 20 131 18 191-2M382 337c53 15 119 12 184-4" fill="none" stroke="#93592f" stroke-width="7" opacity=".55"/>
+  <circle cx="480" cy="151" r="13" fill="#754520" opacity=".65"/><circle cx="480" cy="151" r="5" fill="#e6bd8b"/>
+  <path fill="#704421" opacity=".25" d="M318 340v27q0 42 42 42h240q42 0 42-42v-27q-5 44-47 44H365q-42 0-47-44z"/>
+</svg>

@@ -283,7 +283,7 @@ export default function LandingView({
               <div>
                 <div className="relative h-40 bg-slate-100 dark:bg-slate-800 overflow-hidden">
                   <img 
-                    src={b.image || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80'} 
+                    src={b.image || '/images/wood-batches/coffee-table.svg'}
                     alt={b.productName}
                     className="w-full h-full object-cover"
                   />

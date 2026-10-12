@@ -49,8 +49,8 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+app.use(express.json({ limit: '7mb' }));
+app.use(express.urlencoded({ extended: true, limit: '7mb' }));
 
 // Rate Limiters
 const generalApiLimiter = rateLimit({
@@ -127,6 +127,7 @@ function formatBatchRow(row) {
     brand: row.brand,
     sku: row.sku,
     category: row.category,
+    image: row.image || '',
     manufactureDate: row.manufacture_date,
     expiryDate: row.expiry_date,
     qcStatus: row.qc_status,
@@ -434,8 +435,8 @@ app.post('/api/batches', authenticateToken, requireRoles('Admin Rantai Pasok', '
         batch_number, product_name, brand, sku, category,
         manufacture_date, expiry_date, qc_status, qc_score,
         qc_inspector, carbon_footprint, carbon_rating,
-        verification_hash, story, materials, timeline, ai_analysis
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        verification_hash, story, image, materials, timeline, ai_analysis
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *;
     `;
     const values = [
@@ -449,6 +450,7 @@ app.post('/api/batches', authenticateToken, requireRoles('Admin Rantai Pasok', '
       b.carbonRating || 'Kategori Hijau (Rendah Emisi)',
       b.verificationHash || autoHash,
       b.story || '',
+      b.image || '',
       JSON.stringify(b.materials || []),
       JSON.stringify(b.timeline || []),
       JSON.stringify(b.aiAnalysis || {})
@@ -499,18 +501,19 @@ app.put('/api/batches/:batchNumber', authenticateToken, requireRoles('Admin Rant
         carbon_footprint = $10,
         carbon_rating = $11,
         story = $12,
-        materials = $13,
-        timeline = $14,
-        ai_analysis = $15,
+        image = $13,
+        materials = $14,
+        timeline = $15,
+        ai_analysis = $16,
         updated_at = CURRENT_TIMESTAMP
-      WHERE batch_number = $16
+      WHERE batch_number = $17
       RETURNING *;
     `;
     const values = [
       b.productName, b.brand, b.sku, b.category,
       b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
       b.qcInspector, b.carbonFootprint, b.carbonRating,
-      b.story, JSON.stringify(b.materials || []),
+      b.story, b.image || '', JSON.stringify(b.materials || []),
       JSON.stringify(b.timeline || []), JSON.stringify(b.aiAnalysis || {}),
       batchNumber
     ];

@@ -1,6 +1,7 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Printer, X, ShieldCheck } from 'lucide-react';
+import { getBatchPassportUrl } from '../utils/passport';
 
 export default function LabelPrintModal({ isOpen, onClose, batch }) {
   if (!isOpen || !batch) return null;
@@ -62,7 +63,7 @@ export default function LabelPrintModal({ isOpen, onClose, batch }) {
 
             <div className="bg-slate-50 p-2 rounded-xl border border-slate-200 flex flex-col items-center">
               <QRCodeSVG 
-                value={`https://qrtrace.app/verify/${batch.batchNumber}`}
+                value={getBatchPassportUrl(batch.batchNumber)}
                 size={80}
                 bgColor="#f8fafc"
                 fgColor="#000000"

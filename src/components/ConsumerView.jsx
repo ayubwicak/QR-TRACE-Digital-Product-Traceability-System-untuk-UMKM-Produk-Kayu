@@ -11,8 +11,9 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { api } from '../api';
+import { getBatchPassportUrl } from '../utils/passport';
 
-export default function ConsumerView({ batch, onBackToAdmin }) {
+export default function ConsumerView({ batch, compactPreview = false, onBackToAdmin }) {
   const [activeTab, setActiveTab] = useState('materials');
   const [copied, setCopied] = useState(false);
 
@@ -36,18 +37,77 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
     }
   };
 
+  if (compactPreview) {
+    const mainMaterial = batch.materials?.find(material => /kayu|wood/i.test(material.name));
+
+    return (
+      <section className="mx-auto max-w-xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
+        <div className="relative h-56 bg-slate-100 sm:h-72">
+          <img
+            src={batch.image || '/images/wood-batches/coffee-table.svg'}
+            alt={batch.productName}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/95 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-sm">
+            <CheckCircle2 className="h-4 w-4" />
+            Produk terverifikasi
+          </div>
+        </div>
+
+        <div className="space-y-5 p-5 sm:p-7">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-teal-700">{batch.category}</p>
+            <h1 className="mt-1 text-2xl font-extrabold leading-tight text-slate-900">{batch.productName}</h1>
+            <p className="mt-1 text-sm font-medium text-slate-500">{batch.brand}</p>
+          </div>
+
+          {batch.story && (
+            <p className="line-clamp-3 text-sm leading-relaxed text-slate-600">{batch.story}</p>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs text-slate-500">Bahan utama</p>
+              <p className="mt-1 text-sm font-bold text-slate-800">{mainMaterial?.name || 'Kayu'}</p>
+            </div>
+            <div className="rounded-2xl bg-emerald-50 p-4">
+              <p className="text-xs text-emerald-700">Pemeriksaan mutu</p>
+              <p className="mt-1 text-sm font-bold text-emerald-800">Lolos · {batch.qcScore}%</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+            <div>
+              <p className="text-xs text-slate-500">Nomor batch</p>
+              <p className="mt-0.5 font-mono text-sm font-bold text-slate-800">{batch.batchNumber}</p>
+            </div>
+            <button
+              onClick={handleShare}
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <Share2 className="h-4 w-4" />
+              {copied ? 'Tersalin!' : 'Bagikan'}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div className="w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden text-slate-800 dark:text-slate-100">
       
       {/* Top Header Bar */}
       <div className="bg-slate-900 text-white py-3.5 px-6 flex items-center justify-between border-b border-slate-800">
-        <button 
-          onClick={onBackToAdmin}
-          className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-2 transition active:scale-95 bg-slate-800/90 hover:bg-slate-700 px-3.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4 text-teal-400" />
-          <span>Kembali ke Katalog</span>
-        </button>
+        {onBackToAdmin ? (
+          <button
+            onClick={onBackToAdmin}
+            className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-2 transition active:scale-95 bg-slate-800/90 hover:bg-slate-700 px-3.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 text-teal-400" />
+            <span>Kembali ke Katalog</span>
+          </button>
+        ) : <span className="text-sm font-bold tracking-wide text-white">QR Trace · Paspor Produk Kayu</span>}
         
         <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-emerald-400 bg-emerald-950/90 px-3 py-1 rounded-full border border-emerald-800 flex items-center gap-1.5 font-semibold">
@@ -67,7 +127,7 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
       {/* Product Hero Banner */}
       <div className="relative h-64 sm:h-72 bg-slate-900 overflow-hidden">
         <img 
-          src={batch.image || 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=1200&q=80'} 
+          src={batch.image || '/images/wood-batches/coffee-table.svg'}
           alt={batch.productName}
           className="w-full h-full object-cover opacity-80"
         />
@@ -91,7 +151,7 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
           
           <div className="flex items-center gap-3 bg-slate-900/80 backdrop-blur-md p-2.5 rounded-xl border border-slate-700/60">
             <div className="w-12 h-12 rounded-lg bg-white p-1 flex items-center justify-center shrink-0">
-              <QRCodeSVG value={batch.batchNumber} size={40} />
+              <QRCodeSVG value={getBatchPassportUrl(batch.batchNumber)} size={40} />
             </div>
             <div className="text-left">
               <p className="text-[10px] text-slate-400 font-mono">Nomor Batch / SHA-256</p>

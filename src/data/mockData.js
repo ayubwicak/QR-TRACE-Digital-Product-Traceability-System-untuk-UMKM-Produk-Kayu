@@ -5,7 +5,7 @@ const ORIGINAL_WOOD_BATCHES = [
     category: 'Furnitur Kayu',
     brand: 'Temerloh Kayu Lestari',
     sku: 'TKL-MKJ-001',
-    image: 'https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/coffee-table.svg',
     manufactureDate: '2026-10-01',
     expiryDate: '2028-10-01',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -41,7 +41,7 @@ const ORIGINAL_WOOD_BATCHES = [
     category: 'Furnitur Kayu',
     brand: 'Bengkel Perabot Mahoni',
     sku: 'BPM-KMM-002',
-    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/dining-chair.svg',
     manufactureDate: '2026-10-02',
     expiryDate: '2028-10-02',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A+)',
@@ -77,7 +77,7 @@ const ORIGINAL_WOOD_BATCHES = [
     category: 'Kerajinan Kayu',
     brand: 'Karya Kayu Komuniti',
     sku: 'KKK-TKA-003',
-    image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/acacia-cutting-board.svg',
     manufactureDate: '2026-10-03',
     expiryDate: '2028-10-03',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -141,7 +141,7 @@ const createWoodSampleBatch = ({
   qcInspector,
   qcScore,
   carbonFootprint,
-  carbonRating: 'Estimasi ilustratif — perlu data produksi terverifikasi',
+  carbonRating: 'Estimasi ilustratif (belum diverifikasi)',
   verificationHash,
   story,
   materials: [mainMaterial, ...supportingMaterials],
@@ -192,7 +192,7 @@ export const ADDITIONAL_WOOD_BATCHES = [
     category: 'Furnitur Kayu',
     brand: 'Jepara Kayu Karya',
     sku: 'JKK-LPJ-004',
-    image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/teak-wardrobe.svg',
     manufactureDate: '2026-10-06',
     warrantyEndDate: '2028-10-06',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -219,7 +219,7 @@ export const ADDITIONAL_WOOD_BATCHES = [
     category: 'Furnitur Kayu',
     brand: 'Ruang Kayu UMKM',
     sku: 'RKU-RBP-005',
-    image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/pine-bookshelf.svg',
     manufactureDate: '2026-10-07',
     warrantyEndDate: '2028-10-07',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -246,7 +246,7 @@ export const ADDITIONAL_WOOD_BATCHES = [
     category: 'Furnitur Kayu',
     brand: 'Bengkel Kayu Borneo',
     sku: 'BKB-BTU-006',
-    image: 'https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/ulin-garden-bench.svg',
     manufactureDate: '2026-10-08',
     warrantyEndDate: '2028-10-08',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -273,7 +273,7 @@ export const ADDITIONAL_WOOD_BATCHES = [
     category: 'Kerajinan Kayu',
     brand: 'Kriya Mahoni Studio',
     sku: 'KMS-LMK-007',
-    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/mahogany-table-lamp.svg',
     manufactureDate: '2026-10-09',
     warrantyEndDate: '2027-10-09',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -300,7 +300,7 @@ export const ADDITIONAL_WOOD_BATCHES = [
     category: 'Kerajinan Kayu',
     brand: 'Kriya Sungkai Lokal',
     sku: 'KSL-KPS-008',
-    image: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80',
+    image: '/images/wood-batches/sungkai-storage-box.svg',
     manufactureDate: '2026-10-10',
     warrantyEndDate: '2027-10-10',
     qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
@@ -325,6 +325,35 @@ export const ADDITIONAL_WOOD_BATCHES = [
 
 export const ADDITIONAL_WOOD_BATCH_NUMBERS = ADDITIONAL_WOOD_BATCHES.map(batch => batch.batchNumber);
 export const INITIAL_BATCHES = [...ORIGINAL_WOOD_BATCHES, ...ADDITIONAL_WOOD_BATCHES];
+
+const LEGACY_FOOD_SAMPLE_NAMES = new Set([
+  'Kopi Robusta Temerloh Organik 250g',
+  'Sabun Herbal Minyak Atsiri Serai 100g',
+  'Madu Kelulut Asli Hutan Tropis 350g',
+  'Kripik',
+  'Pisang'
+]);
+
+const LEGACY_FOOD_DEMO_BATCHES = new Map([
+  ['BATCH-2026-N04', 'Kripik'],
+  ['BATCH-2026-N05', 'Pisang']
+]);
+
+export const migrateLegacyWoodBatches = batches => batches.flatMap(batch => {
+  if (!LEGACY_FOOD_SAMPLE_NAMES.has(batch.productName)) return [batch];
+
+  const replacement = INITIAL_BATCHES.find(sample => sample.batchNumber === batch.batchNumber);
+  if (replacement) return [replacement];
+
+  return LEGACY_FOOD_DEMO_BATCHES.get(batch.batchNumber) === batch.productName ? [] : [batch];
+});
+
+export const withWoodSampleImages = batches => batches.map(batch => {
+  const sample = INITIAL_BATCHES.find(candidate =>
+    candidate.batchNumber === batch.batchNumber && candidate.productName === batch.productName
+  );
+  return sample ? { ...batch, image: sample.image } : batch;
+});
 
 export const WOOD_CATEGORY_ALIASES = {
   materials: ['kayu olahan', 'komponen kayu', 'processed wood', 'wood components'],

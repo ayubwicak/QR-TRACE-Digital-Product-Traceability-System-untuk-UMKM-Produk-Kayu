@@ -87,7 +87,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const defaultFallbackImage = 'https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&w=600&q=80';
+    const defaultFallbackImage = '/images/wood-batches/coffee-table.svg';
     const newBatchObj = {
       batchNumber: formData.batchNumber,
       productName: formData.productName,

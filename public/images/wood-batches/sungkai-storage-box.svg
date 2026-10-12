@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#f3ede2"/><stop offset="1" stop-color="#dfd0b9"/></linearGradient>
+    <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#c58b56"/><stop offset="1" stop-color="#8a5735"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="773" cy="90" r="150" fill="#fff" opacity=".3"/>
+  <ellipse cx="480" cy="420" rx="248" ry="27" fill="#765a41" opacity=".2"/>
+  <path fill="#75492e" d="m264 210 216-75 216 75v208l-216 70-216-70z"/>
+  <path fill="url(#wood)" stroke="#70472d" stroke-width="8" d="m282 220 198-69 198 69v178l-198 65-198-65z"/>
+  <path fill="#d8a36b" stroke="#785033" stroke-width="7" d="m282 220 198-69 198 69-198 73z"/>
+  <path fill="#ad7445" stroke="#785033" stroke-width="6" d="m302 245 178 63v148l-178-59z"/>
+  <path fill="#986139" stroke="#70472d" stroke-width="6" d="m500 308 158-63v152l-158 59z"/>
+  <path fill="none" stroke="#efc58f" stroke-width="5" d="m328 224 153 55 148-55m-309 52 140 49m-135-14 135 47m175-82-120 49m119-13-119 49"/>
+  <path fill="#6c472e" d="M463 299h34v28h-34z"/><path fill="#e1b777" d="M474 305h12v16h-12z"/>
+</svg>

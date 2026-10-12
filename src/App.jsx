@@ -15,17 +15,18 @@ import QrScannerModal from './components/QrScannerModal';
 import EcoCalculatorModal from './components/EcoCalculatorModal';
 import CertificateModal from './components/CertificateModal';
 import Toast from './components/Toast';
-import { ADDITIONAL_WOOD_BATCHES, INITIAL_BATCHES, INITIAL_AUDIT_LOGS } from './data/mockData';
+import {
+  ADDITIONAL_WOOD_BATCHES,
+  INITIAL_BATCHES,
+  INITIAL_AUDIT_LOGS,
+  migrateLegacyWoodBatches,
+  withWoodSampleImages
+} from './data/mockData';
 import { TRANSLATIONS } from './data/i18n';
 import { api } from './api';
+import { getBatchNumberFromPassportPath } from './utils/passport';
 import confetti from 'canvas-confetti';
 import { ShieldCheck, Database, ArrowLeft, QrCode, ArrowRight, Globe2 } from 'lucide-react';
-
-const LEGACY_SAMPLE_NAMES = new Set([
-  'Kopi Robusta Temerloh Organik 250g',
-  'Sabun Herbal Minyak Atsiri Serai 100g',
-  'Madu Kelulut Asli Hutan Tropis 350g'
-]);
 
 const LEGACY_SAMPLE_AUDIT_DETAILS = new Set([
   'Menyetujui rilis batch kopi setelah verifikasi hasil lab kadar air 11.2% dan uji aroma.',
@@ -42,15 +43,12 @@ const loadBatches = () => {
   }
 
   const savedBatches = JSON.parse(saved);
-  const batches = savedBatches.map(batch => {
-    if (!LEGACY_SAMPLE_NAMES.has(batch.productName)) return batch;
-    return INITIAL_BATCHES.find(sample => sample.batchNumber === batch.batchNumber) || batch;
-  });
+  const batches = withWoodSampleImages(migrateLegacyWoodBatches(savedBatches));
 
-  if (localStorage.getItem('qrtrace_wood_samples_v1_migrated') !== 'true') {
+  if (localStorage.getItem('qrtrace_wood_samples_v2_migrated') !== 'true') {
     const existingBatchNumbers = new Set(batches.map(batch => batch.batchNumber));
     batches.push(...ADDITIONAL_WOOD_BATCHES.filter(batch => !existingBatchNumbers.has(batch.batchNumber)));
-    localStorage.setItem('qrtrace_wood_samples_v1_migrated', 'true');
+    localStorage.setItem('qrtrace_wood_samples_v2_migrated', 'true');
   }
 
   return batches;
@@ -83,6 +81,8 @@ const loadCurrentUser = () => {
 
 export default function App() {
   const [batches, setBatches] = useState(loadBatches);
+  const [passportBatchNumber] = useState(() => getBatchNumberFromPassportPath(window.location.pathname));
+  const [publicPassportStatus, setPublicPassportStatus] = useState(passportBatchNumber ? 'loading' : 'idle');
 
   const [auditLogs, setAuditLogs] = useState(loadAuditLogs);
 
@@ -91,7 +91,7 @@ export default function App() {
 
   const [selectedBatch, setSelectedBatch] = useState(INITIAL_BATCHES[0]);
   // Initial View Mode: 'landing' (Informasi Sistem Pertama kali saat buka aplikasi)
-  const [viewMode, setViewMode] = useState('landing'); // 'landing' | 'catalog' | 'detail' | 'consumer'
+  const [viewMode, setViewMode] = useState(passportBatchNumber ? 'consumer' : 'landing'); // 'landing' | 'catalog' | 'detail' | 'consumer'
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [lang, setLang] = useState('id'); // 'id' | 'ms' | 'en'
@@ -201,8 +201,11 @@ export default function App() {
         }
         const dbBatches = await api.getBatches();
         if (dbBatches && dbBatches.length > 0) {
-          setBatches(dbBatches);
-          setSelectedBatch(dbBatches[0]);
+          const batchesWithImages = withWoodSampleImages(dbBatches);
+          setBatches(batchesWithImages);
+          setSelectedBatch(passportBatchNumber
+            ? batchesWithImages.find(batch => batch.batchNumber === passportBatchNumber) || batchesWithImages[0]
+            : batchesWithImages[0]);
         }
         const dbLogs = await api.getAuditLogs();
         if (dbLogs && dbLogs.length > 0) {
@@ -211,9 +214,25 @@ export default function App() {
       } else {
         setDbStatus('OFFLINE');
       }
+
+      if (passportBatchNumber) {
+        const verification = await api.verifyBatch(passportBatchNumber);
+        const localBatch = loadBatches().find(batch => batch.batchNumber === passportBatchNumber);
+        const passportBatch = verification.verified
+          ? withWoodSampleImages([verification.batch])[0]
+          : localBatch;
+
+        if (passportBatch) {
+          setSelectedBatch(passportBatch);
+          setViewMode('consumer');
+          setPublicPassportStatus('ready');
+        } else {
+          setPublicPassportStatus('not-found');
+        }
+      }
     }
     loadDbData();
-  }, []);
+  }, [passportBatchNumber]);
 
   // Sync to localStorage as backup
   useEffect(() => {
@@ -452,46 +471,64 @@ export default function App() {
         {/* Top Control Bar for Simulator / Return to Admin */}
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 py-3">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-            <button
-              onClick={() => setViewMode('catalog')}
-              className="text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-teal-700 border border-slate-200 flex items-center gap-2 transition active:scale-95 shadow-xs whitespace-nowrap cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>{t.backToAdmin}</span>
-            </button>
+            {passportBatchNumber ? (
+              <span className="text-sm font-bold text-slate-800">QR Trace · Paspor Produk Kayu</span>
+            ) : (
+              <button
+                onClick={() => setViewMode('catalog')}
+                className="text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-teal-700 border border-slate-200 flex items-center gap-2 transition active:scale-95 shadow-xs whitespace-nowrap cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>{t.backToAdmin}</span>
+              </button>
+            )}
 
-            <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="font-semibold text-slate-800">{t.consumerPassportPreview}</span>
-            </div>
+            {!passportBatchNumber && (
+              <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="font-semibold text-slate-800">{t.consumerPassportPreview}</span>
+              </div>
+            )}
 
             {/* Quick Batch Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 hidden md:inline">{t.chooseProduct}</span>
-              <select
-                value={selectedBatch?.batchNumber}
-                onChange={(e) => {
-                  const b = batches.find(item => item.batchNumber === e.target.value);
-                  if (b) setSelectedBatch(b);
-                }}
-                className="text-xs bg-white border border-slate-200 text-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500 font-mono"
-              >
-                {batches.map(b => (
-                  <option key={b.batchNumber} value={b.batchNumber}>
-                    {b.productName} ({b.batchNumber})
-                  </option>
-                ))}
-              </select>
-            </div>
+            {!passportBatchNumber && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-slate-400 hidden md:inline">{t.chooseProduct}</span>
+                <select
+                  value={selectedBatch?.batchNumber}
+                  onChange={(e) => {
+                    const b = batches.find(item => item.batchNumber === e.target.value);
+                    if (b) setSelectedBatch(b);
+                  }}
+                  className="text-xs bg-white border border-slate-200 text-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-teal-500 font-mono"
+                >
+                  {batches.map(b => (
+                    <option key={b.batchNumber} value={b.batchNumber}>
+                      {b.productName} ({b.batchNumber})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </header>
 
         {/* Full Desktop Consumer Passport View */}
         <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-6xl w-full mx-auto">
-          <ConsumerView 
-            batch={selectedBatch} 
-            onBackToAdmin={() => setViewMode('catalog')} 
-          />
+          {publicPassportStatus === 'loading' ? (
+            <p className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-600">Memverifikasi paspor produk...</p>
+          ) : publicPassportStatus === 'not-found' ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
+              <h1 className="font-bold text-amber-950">Produk tidak ditemukan</h1>
+              <p className="mt-2 text-sm text-amber-800">Nomor batch {passportBatchNumber} tidak terdaftar pada sistem QR Trace.</p>
+            </div>
+          ) : (
+            <ConsumerView
+              batch={selectedBatch}
+              compactPreview={Boolean(passportBatchNumber)}
+              onBackToAdmin={passportBatchNumber ? undefined : () => setViewMode('catalog')}
+            />
+          )}
         </main>
 
         <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-200">

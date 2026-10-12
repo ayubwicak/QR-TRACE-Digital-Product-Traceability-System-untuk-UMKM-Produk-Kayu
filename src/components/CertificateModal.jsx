@@ -1,5 +1,6 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { getBatchPassportUrl } from '../utils/passport';
 import { Award, Printer, X, CheckCircle2 } from 'lucide-react';
 
 export default function CertificateModal({ isOpen, onClose, batch }) {
@@ -90,7 +91,7 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
               <div className="flex items-center gap-3">
                 <div className="bg-white p-1.5 rounded-lg border border-slate-200">
                   <QRCodeSVG 
-                    value={`https://qrtrace.app/verify/${batch.batchNumber}`}
+                    value={getBatchPassportUrl(batch.batchNumber)}
                     size={64}
                     bgColor="#ffffff"
                     fgColor="#000000"

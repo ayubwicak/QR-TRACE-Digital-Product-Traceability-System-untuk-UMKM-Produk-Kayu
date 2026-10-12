@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#f4eee5"/><stop offset="1" stop-color="#e1d2bd"/></linearGradient>
+    <linearGradient id="wood" x2="1"><stop stop-color="#c58a52"/><stop offset=".5" stop-color="#a66c3d"/><stop offset="1" stop-color="#83512f"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="780" cy="90" r="150" fill="#fff" opacity=".3"/>
+  <path fill="#9f8a73" opacity=".3" d="M195 443h570v20H195z"/>
+  <path fill="#80502e" d="M283 89h394v350H283z"/><path fill="url(#wood)" stroke="#714528" stroke-width="8" d="M300 82h360v344H300z"/>
+  <path fill="#d3a06a" stroke="#80502e" stroke-width="5" d="M319 103h153v300H319zm169 0h153v300H488z"/>
+  <path d="M341 126v253m23-253v253m23-253v253m23-253v253m23-253v253M510 126v253m23-253v253m23-253v253m23-253v253m23-253v253" stroke="#a9703e" stroke-width="4" opacity=".6"/>
+  <path fill="#704421" d="M446 238h10v38h-10zm66 0h10v38h-10z"/><circle cx="451" cy="256" r="5" fill="#f0d4a6"/><circle cx="517" cy="256" r="5" fill="#f0d4a6"/>
+  <path fill="#8b572f" d="M317 426h18v18h-18zm308 0h18v18h-18z"/>
+</svg>

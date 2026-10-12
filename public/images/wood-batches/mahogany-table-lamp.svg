@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#eee9df"/><stop offset="1" stop-color="#d9c8ae"/></linearGradient>
+    <linearGradient id="wood" x2="1"><stop stop-color="#a86b43"/><stop offset=".5" stop-color="#75452f"/><stop offset="1" stop-color="#b47a4e"/></linearGradient>
+    <linearGradient id="shade" x2="0" y2="1"><stop stop-color="#f5d99c"/><stop offset="1" stop-color="#d9aa63"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h960v540H0z"/><circle cx="480" cy="255" r="205" fill="#ffd983" opacity=".12"/>
+  <path fill="#9a8060" opacity=".35" d="M250 432h460v18H250z"/>
+  <path fill="url(#shade)" stroke="#8f663c" stroke-width="8" d="m321 170 52-92h214l52 92z"/>
+  <path fill="#fff2cd" opacity=".4" d="m355 153 34-59h195l33 59z"/>
+  <path fill="url(#wood)" stroke="#63402c" stroke-width="8" d="M463 170h34v187h-34z"/>
+  <path fill="#d5a16b" stroke="#70472f" stroke-width="8" d="M390 356q90-25 180 0l44 55q-134 42-268 0z"/>
+  <path fill="none" stroke="#d49a65" stroke-width="5" d="M479 187v151"/>
+  <path fill="#fff0b9" opacity=".3" d="m350 177 54 164-60 74-38-8 45-58-40-164z"/>
+</svg>
