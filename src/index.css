@@ -13,9 +13,9 @@
   }
 
   .dark {
-    --bg-page: #0b1120;
-    --card-bg: #111827;
-    --card-border: #1f2937;
+    --bg-page: #090d16;
+    --card-bg: #0f172a;
+    --card-border: #1e293b;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
@@ -32,19 +32,38 @@
   }
 }
 
+/* Eye-Friendly Gradient Ambient Background */
+.bg-ambient-light {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 15% 15%, rgba(20, 184, 166, 0.07) 0px, transparent 45%),
+    radial-gradient(at 85% 20%, rgba(99, 102, 241, 0.05) 0px, transparent 40%),
+    radial-gradient(at 50% 85%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+.bg-ambient-dark {
+  background-color: #090d16;
+  background-image: 
+    radial-gradient(at 15% 15%, rgba(20, 184, 166, 0.12) 0px, transparent 45%),
+    radial-gradient(at 85% 20%, rgba(99, 102, 241, 0.09) 0px, transparent 40%),
+    radial-gradient(at 50% 85%, rgba(14, 165, 233, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
 /* Glassmorphism & Surface Utilities */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .dark .glass-panel {
-  background: rgba(17, 24, 39, 0.88);
+  background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(31, 41, 55, 0.85);
+  border: 1px solid rgba(30, 41, 59, 0.85);
 }
 
 .card-hover {
@@ -58,21 +77,6 @@
 
 .dark .card-hover:hover {
   box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.5);
-}
-
-/* Subtle Animated Ambient Mesh */
-.bg-mesh {
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.06) 0px, transparent 40%),
-    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 40%),
-    radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.04) 0px, transparent 50%);
-}
-
-.dark .bg-mesh {
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.12) 0px, transparent 45%),
-    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.09) 0px, transparent 45%),
-    radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.07) 0px, transparent 55%);
 }
 
 /* Crisp Clean Scrollbars */

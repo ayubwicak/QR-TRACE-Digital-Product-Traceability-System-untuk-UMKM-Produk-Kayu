@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   Save, 
   Plus, 
   Trash2, 
   Box, 
-  Factory 
+  Factory,
+  UploadCloud,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 
 export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) {
   const [formData, setFormData] = useState(null);
+  const fileInputRef = useRef(null);
+  const [imageError, setImageError] = useState('');
 
   useEffect(() => {
     if (batch) {
@@ -18,6 +23,37 @@ export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) 
   }, [batch]);
 
   if (!isOpen || !formData) return null;
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    setImageError('');
+    if (!file) return;
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setImageError('Format tidak didukung. Pilih JPG, JPEG, PNG, atau WEBP.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError('Ukuran file maksimal 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, image: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setFormData(prev => ({ ...prev, image: '' }));
+    setImageError('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleAddMaterial = () => {
     setFormData({
@@ -123,7 +159,92 @@ export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) 
             </div>
           </div>
 
+          {/* Upload / Impor Gambar Produk */}
+          <div className="space-y-1.5">
+            <label className="text-slate-700 font-medium block">
+              Foto Produk (JPG, JPEG, PNG, WEBP - Maks. 5MB)
+            </label>
+
+            <input 
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              className="hidden"
+            />
+
+            {!formData.image ? (
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-300 hover:border-teal-500 bg-slate-50/70 hover:bg-teal-50/40 rounded-2xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 group"
+              >
+                <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center group-hover:scale-110 transition">
+                  <UploadCloud className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-800">
+                    Klik untuk Memilih / Mengganti Gambar Produk
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Mendukung file JPG, JPEG, PNG, WEBP (Maksimal 5MB)
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
+                  <img 
+                    src={formData.image} 
+                    alt="Pratinjau Produk" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Gambar Produk Terpasang
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Pratinjau gambar siap diperbarui di katalog & paspor.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1 text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg transition cursor-pointer"
+                  >
+                    Ganti
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                    title="Hapus Gambar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {imageError && (
+              <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium">
+                <AlertCircle className="w-3.5 h-3.5" />
+                {imageError}
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div>
+              <label className="text-slate-700 font-medium block mb-1">Inspektur QC</label>
+              <input 
+                type="text"
+                value={formData.qcInspector}
+                onChange={e => setFormData({ ...formData, qcInspector: e.target.value })}
+                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
+              />
+            </div>
             <div>
               <label className="text-slate-700 font-medium block mb-1">Status Pengujian QC</label>
               <input 
@@ -141,15 +262,6 @@ export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) 
                 value={formData.qcScore}
                 onChange={e => setFormData({ ...formData, qcScore: Number(e.target.value) })}
                 className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-800 font-mono"
-              />
-            </div>
-            <div>
-              <label className="text-slate-700 font-medium block mb-1">Inspektur Penanggung Jawab</label>
-              <input 
-                type="text"
-                value={formData.qcInspector}
-                onChange={e => setFormData({ ...formData, qcInspector: e.target.value })}
-                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
               />
             </div>
           </div>

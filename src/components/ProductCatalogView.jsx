@@ -17,6 +17,7 @@ import {
   Download
 } from 'lucide-react';
 import { api } from '../api';
+import { TRANSLATIONS } from '../data/i18n';
 
 export default function ProductCatalogView({
   batches,
@@ -29,12 +30,23 @@ export default function ProductCatalogView({
   searchQuery,
   setSearchQuery,
   categoryFilter,
-  setCategoryFilter
+  setCategoryFilter,
+  lang = 'id'
 }) {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
   const [isExporting, setIsExporting] = useState(false);
+  const [expandedStories, setExpandedStories] = useState({});
 
-  const categories = ['Semua', 'F&B / Agrikultur', 'Personal Care & Herbal', 'Nutraceutical / Superfood', 'Teknologi & Elektronik'];
+  const toggleStory = (batchNumber, e) => {
+    e.stopPropagation();
+    setExpandedStories(prev => ({
+      ...prev,
+      [batchNumber]: !prev[batchNumber]
+    }));
+  };
+
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.id;
+  const categories = t.categories || ['Semua', 'F&B / Agrikultur', 'Personal Care & Herbal', 'Nutraceutical / Superfood', 'Teknologi & Elektronik'];
 
   const handleExportCsv = async () => {
     setIsExporting(true);
@@ -64,6 +76,7 @@ export default function ProductCatalogView({
     
     const matchesCat = 
       categoryFilter === 'Semua' || 
+      categoryFilter === 'All' ||
       b.category.toLowerCase().includes(categoryFilter.toLowerCase());
 
     return matchesSearch && matchesCat;
@@ -79,18 +92,18 @@ export default function ProductCatalogView({
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" /> Sistem Penjejakan Produk & Ketertelusuran Mutu
           </span>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white leading-tight">
-            Katalog Produk & Paspor Digital
+            {t.catalogTitle || 'Katalog Produk & Paspor Digital'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed pt-1">
-            Kelola identitas digital produk dari asal bahan baku, tahapan pengolahan, hasil uji laboratorium, hingga kode QR pada kemasan konsumen.
+            {t.catalogSubtitle || 'Kelola identitas digital produk dari asal bahan baku, tahapan pengolahan, hasil uji laboratorium, hingga kode QR pada kemasan konsumen.'}
           </p>
           <div className="pt-3 flex flex-wrap gap-2.5">
             <button
               onClick={onOpenNewBatch}
-              className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-md flex items-center gap-1.5"
+              className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4 text-slate-950" />
-              Tambah Produk Baru
+              {t.addNewProduct || 'Tambah Produk Baru'}
             </button>
           </div>
         </div>
@@ -102,7 +115,7 @@ export default function ProductCatalogView({
       </div>
 
       {/* Filter and Controls Toolbar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           
           {/* Search Bar */}
@@ -110,10 +123,10 @@ export default function ProductCatalogView({
             <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
             <input 
               type="text"
-              placeholder="Cari nama produk, nomor batch, atau merek..."
+              placeholder={t.searchPlaceholder || 'Cari nama produk, nomor batch, atau merek...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-800 placeholder-slate-400 transition"
+              className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 transition"
             />
           </div>
 
@@ -122,25 +135,25 @@ export default function ProductCatalogView({
             <button
               onClick={handleExportCsv}
               disabled={isExporting}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition cursor-pointer"
               title="Unduh Laporan Audit Data Batch (CSV)"
             >
-              <Download className="w-3.5 h-3.5 text-teal-600" />
-              <span className="hidden sm:inline">{isExporting ? 'Mengunduh...' : 'Ekspor CSV'}</span>
+              <Download className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+              <span className="hidden sm:inline">{isExporting ? '...' : (t.exportCsv || 'Ekspor CSV')}</span>
             </button>
 
-            <span className="text-xs text-slate-500 font-medium hidden sm:inline">Tampilan:</span>
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">{t.viewLabel || 'Tampilan:'}</span>
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition ${viewMode === 'grid' ? 'bg-white text-emerald-800 font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
                 title="Tampilan Kartu (Grid)"
               >
                 <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded-lg transition ${viewMode === 'table' ? 'bg-white text-emerald-800 font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800'}`}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${viewMode === 'table' ? 'bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 font-bold shadow-2xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
                 title="Tampilan Tabel (List)"
               >
                 <List className="w-4 h-4" />
@@ -155,10 +168,10 @@ export default function ProductCatalogView({
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`text-xs px-3 py-1.5 rounded-xl transition whitespace-nowrap font-medium ${
+              className={`text-xs px-3 py-1.5 rounded-xl transition whitespace-nowrap font-medium cursor-pointer ${
                 categoryFilter === cat
-                  ? 'bg-emerald-800 text-white shadow-xs font-semibold'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 border border-slate-200/80'
+                  ? 'bg-emerald-800 dark:bg-emerald-700 text-white shadow-xs font-semibold'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700'
               }`}
             >
               {cat}
@@ -197,15 +210,17 @@ export default function ProductCatalogView({
                 {/* Details Body */}
                 <div className="p-5 space-y-2.5">
                   <div>
-                    <h3 className="font-bold text-base text-slate-900 leading-snug line-clamp-1 group-hover:text-emerald-800 transition">
+                    <h3 className="font-bold text-base text-slate-900 leading-snug group-hover:text-emerald-800 transition">
                       {b.productName}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">{b.brand}</p>
                   </div>
 
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed italic bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                    "{b.story}"
-                  </p>
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800 transition-all">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic whitespace-normal break-words">
+                      "{b.story}"
+                    </p>
+                  </div>
 
                   <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
                     <div className="flex items-center gap-1.5">
@@ -249,9 +264,9 @@ export default function ProductCatalogView({
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => onSimulateScan(b)}
-                    className="text-xs px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-medium rounded-xl transition shadow-2xs flex items-center gap-1"
+                    className="text-xs px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-medium rounded-xl transition shadow-2xs flex items-center gap-1 cursor-pointer"
                   >
-                    <QrCode className="w-3.5 h-3.5 text-slate-500" /> Paspor HP
+                    <QrCode className="w-3.5 h-3.5 text-slate-500" /> Paspor Digital
                   </button>
                   <button
                     onClick={() => onSelectBatch(b)}

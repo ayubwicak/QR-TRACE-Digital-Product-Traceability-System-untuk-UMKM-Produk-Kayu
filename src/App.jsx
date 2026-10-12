@@ -96,11 +96,6 @@ export default function App() {
     localStorage.setItem('qrtrace_user', JSON.stringify(userData));
     showToast('Selamat Datang!', `Berhasil masuk sebagai ${userData.name} (${userData.role}).`);
     setViewMode('catalog'); // Navigate straight into Dashboard after login
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.5 }
-    });
   };
 
   const handleRegisterSuccess = (userData) => {
@@ -108,11 +103,6 @@ export default function App() {
     localStorage.setItem('qrtrace_user', JSON.stringify(userData));
     showToast('Pendaftaran Berhasil', `Selamat bergabung ${userData.name}! Akun Anda telah siap.`);
     setViewMode('catalog'); // Navigate straight into Dashboard after register
-    confetti({
-      particleCount: 70,
-      spread: 70,
-      origin: { y: 0.5 }
-    });
   };
 
   const handleGoToDashboard = () => {
@@ -461,7 +451,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-between transition-colors duration-200">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-ambient-dark' : 'bg-ambient-light'} text-slate-800 dark:text-slate-100 flex flex-col justify-between transition-colors duration-300`}>
       
       <div>
         {/* Navbar */}
@@ -499,6 +489,7 @@ export default function App() {
               onOpenScanner={() => setIsQrScannerOpen(true)}
               onSelectBatch={handleSelectBatch}
               onSimulateScan={handleSimulateScan}
+              lang={lang}
             />
           )}
 
@@ -506,7 +497,7 @@ export default function App() {
           {(viewMode === 'catalog' || viewMode === 'detail') && (
             <>
               {/* Top Stats Overview */}
-              <StatsOverview batches={batches} auditLogs={auditLogs} />
+              <StatsOverview batches={batches} auditLogs={auditLogs} lang={lang} />
 
               {/* VIEW MODE 1: PRODUCT CATALOG DASHBOARD */}
               {viewMode === 'catalog' && (
@@ -522,6 +513,7 @@ export default function App() {
                   setSearchQuery={setSearchQuery}
                   categoryFilter={categoryFilter}
                   setCategoryFilter={setCategoryFilter}
+                  lang={lang}
                 />
               )}
 
@@ -609,17 +601,98 @@ export default function App() {
       {/* Toast Notification */}
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      {/* Clean Human-Centered Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-500 dark:text-slate-400 mt-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>QR Trace • Sistem Paspor Produk & Ketertelusuran Rantai Pasok</span>
+      {/* Professional Structured Footer */}
+      <footer className="border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md text-slate-600 dark:text-slate-400 mt-16 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-8 border-b border-slate-200/80 dark:border-slate-800/80">
+            
+            {/* Brand & Abstract (Col 1-5) */}
+            <div className="md:col-span-5 space-y-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 text-white flex items-center justify-center font-bold shadow-xs">
+                  <ShieldCheck className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 dark:text-white text-base tracking-tight leading-none">
+                    QR TRACE
+                  </h3>
+                  <span className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-semibold">
+                    Digital Product Passport & Traceability
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Platform Paspor Produk Digital terintegrasi untuk ketertelusuran rantai pasok multi-tier, penjaminan mutu berbasis SOP, audit kriptografi SHA-256 terdesentralisasi, serta penghitungan jejak karbon ESG.
+              </p>
+
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>PostgreSQL System Ready</span>
+              </div>
+            </div>
+
+            {/* Core Features / Pillars (Col 6-8) */}
+            <div className="md:col-span-3 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                Fitur Utama
+              </h4>
+              <ul className="text-xs space-y-2 text-slate-500 dark:text-slate-400">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                  <span>Paspor Digital & QR Dinamis</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                  <span>Buku Besar Audit SHA-256</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                  <span>Pemeriksaan Mutu & SOP QC</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                  <span>Kalkulasi Emisi Karbon ESG</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Academic & Innovation Context (Col 9-12) */}
+            <div className="md:col-span-4 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                Konteks Inovasi
+              </h4>
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-1.5 text-xs">
+                <div className="font-semibold text-slate-800 dark:text-slate-200">
+                  iPEC '26 (Innovative Product Exhibition & Competition)
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Kolej Komuniti Temerloh & Universitas Teknologi Digital Indonesia
+                </div>
+                <div className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-medium pt-1">
+                  Kategori: Teknologi, Digital & Kelestarian
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-[11px]">
-            <Database className="w-3.5 h-3.5 text-slate-400" />
-            <span>Terhubung ke Database <strong>PostgreSQL Live</strong></span>
+
+          {/* Sub-footer / Bottom bar */}
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 dark:text-slate-500">
+            <div>
+              © {new Date().getFullYear()} QR Trace. Hak Cipta Terpelihara.
+            </div>
+            <div className="flex items-center gap-4 font-mono text-[10px]">
+              <span>ISO 22000</span>
+              <span>•</span>
+              <span>HACCP</span>
+              <span>•</span>
+              <span>EU DPP Standards</span>
+            </div>
           </div>
+
         </div>
       </footer>
 

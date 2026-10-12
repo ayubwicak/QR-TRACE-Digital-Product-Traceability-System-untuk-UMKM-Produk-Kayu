@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Plus, 
   X, 
   Box, 
   CheckCircle2, 
-  QrCode
+  QrCode,
+  UploadCloud,
+  Image as ImageIcon,
+  Trash2,
+  AlertCircle
 } from 'lucide-react';
 
 export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatchCount }) {
+  const fileInputRef = useRef(null);
+  const [imageError, setImageError] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+
   const [formData, setFormData] = useState({
     batchNumber: `BATCH-2026-N0${currentBatchCount + 1}`,
     productName: '',
@@ -21,6 +29,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
     qcScore: 98.6,
     carbonFootprint: '0.35 kg CO₂e / unit',
     carbonRating: 'A (Rendah Karbon)',
+    image: '',
     story: 'Diproduksi menggunakan bahan baku terverifikasi dengan standar pengolahan bersih dan ramah lingkungan.',
     rawMaterial1: 'Bahan Baku Primer Grade Super',
     rawOrigin1: 'Petani Lokal Temerloh',
@@ -38,8 +47,45 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
 
   if (!isOpen) return null;
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    setImageError('');
+    if (!file) return;
+
+    // Validasi tipe format gambar
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setImageError('Format tidak didukung. Harap pilih file JPG, JPEG, PNG, atau WEBP.');
+      return;
+    }
+
+    // Validasi ukuran file (maksimal 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError('Ukuran file terlalu besar. Maksimal ukuran gambar adalah 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Data = reader.result;
+      setImagePreview(base64Data);
+      setFormData(prev => ({ ...prev, image: base64Data }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview('');
+    setImageError('');
+    setFormData(prev => ({ ...prev, image: '' }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const defaultFallbackImage = 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80';
     const newBatchObj = {
       batchNumber: formData.batchNumber,
       productName: formData.productName,
@@ -53,6 +99,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
       qcScore: Number(formData.qcScore) || 98.5,
       carbonFootprint: formData.carbonFootprint,
       carbonRating: formData.carbonRating,
+      image: formData.image || defaultFallbackImage,
       verificationHash: `0x${Math.random().toString(16).substring(2, 10)}${Math.random().toString(16).substring(2, 10)}`,
       story: formData.story,
       materials: [
@@ -199,6 +246,82 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
                 className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
               />
             </div>
+          </div>
+
+          {/* Upload / Impor Gambar Produk */}
+          <div className="space-y-1.5">
+            <label className="text-slate-700 font-medium block">
+              Foto Produk (JPG, JPEG, PNG, WEBP - Maks. 5MB)
+            </label>
+
+            <input 
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              className="hidden"
+            />
+
+            {!imagePreview ? (
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-slate-300 hover:border-teal-500 bg-slate-50/70 hover:bg-teal-50/40 rounded-2xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 group"
+              >
+                <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center group-hover:scale-110 transition">
+                  <UploadCloud className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-800">
+                    Klik untuk Memilih Gambar Produk
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Mendukung file JPG, JPEG, PNG, WEBP (Maksimal 5MB)
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
+                  <img 
+                    src={imagePreview} 
+                    alt="Pratinjau Produk" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Gambar Berhasil Dipilih
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Pratinjau siap diterbitkan ke kartu paspor produk.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1 text-[11px] font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg transition cursor-pointer"
+                  >
+                    Ganti
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                    title="Hapus Gambar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {imageError && (
+              <p className="text-xs text-rose-600 flex items-center gap-1 mt-1 font-medium">
+                <AlertCircle className="w-3.5 h-3.5" />
+                {imageError}
+              </p>
+            )}
           </div>
 
           {/* Bahan Baku Ketertelusuran */}

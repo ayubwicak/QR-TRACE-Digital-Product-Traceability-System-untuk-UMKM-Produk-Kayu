@@ -3,13 +3,15 @@ import {
   Package, 
   ShieldCheck, 
   FileCheck2, 
-  Layers,
-  TrendingUp,
-  CheckCircle2,
-  Lock
+  Layers, 
+  TrendingUp, 
+  CheckCircle2, 
+  Lock 
 } from 'lucide-react';
+import { TRANSLATIONS } from '../data/i18n';
 
-export default function StatsOverview({ batches, auditLogs }) {
+export default function StatsOverview({ batches, auditLogs, lang = 'id' }) {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.id;
   const totalBatches = batches.length;
   const passedQcCount = batches.filter(b => (b.qcScore && b.qcScore >= 90) || (b.qcStatus && (b.qcStatus.includes('Lolos') || b.qcStatus.includes('Passed')))).length;
   const avgQcScore = totalBatches > 0 
@@ -24,7 +26,7 @@ export default function StatsOverview({ batches, auditLogs }) {
       <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 opacity-80" />
         <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>Batch Terdaftar</span>
+          <span>{t.registeredBatches || 'Batch Terdaftar'}</span>
           <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60 dark:border-teal-800/60 group-hover:scale-110 transition-transform">
             <Package className="w-4 h-4" />
           </div>
@@ -36,7 +38,7 @@ export default function StatsOverview({ batches, auditLogs }) {
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-              Semua aktif dengan QR
+              {t.allActiveWithQr || 'Semua aktif dengan QR'}
             </p>
           </div>
           <span className="text-[10px] font-semibold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 px-2 py-0.5 rounded-full flex items-center gap-0.5">
@@ -49,7 +51,7 @@ export default function StatsOverview({ batches, auditLogs }) {
       <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-80" />
         <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>Kepatuhan Uji Mutu</span>
+          <span>{t.qcCompliance || 'Kepatuhan Uji Mutu'}</span>
           <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/60 group-hover:scale-110 transition-transform">
             <ShieldCheck className="w-4 h-4" />
           </div>
@@ -61,7 +63,7 @@ export default function StatsOverview({ batches, auditLogs }) {
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-              {passedQcCount} batch lolos standar
+              {passedQcCount} {t.passedStandard || 'batch lolos standar'}
             </p>
           </div>
           <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
@@ -74,7 +76,7 @@ export default function StatsOverview({ batches, auditLogs }) {
       <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-blue-500 opacity-80" />
         <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>Validasi Otomatis (QA)</span>
+          <span>{t.qaAutomation || 'Validasi Otomatis (QA)'}</span>
           <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/60 group-hover:scale-110 transition-transform">
             <FileCheck2 className="w-4 h-4" />
           </div>
@@ -99,7 +101,7 @@ export default function StatsOverview({ batches, auditLogs }) {
       <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-500 opacity-80" />
         <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>Catatan Log Audit</span>
+          <span>{t.auditRecordsCount || 'Catatan Log Audit'}</span>
           <div className="w-8 h-8 rounded-xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-200/60 dark:border-violet-800/60 group-hover:scale-110 transition-transform">
             <Layers className="w-4 h-4" />
           </div>
@@ -111,11 +113,11 @@ export default function StatsOverview({ batches, auditLogs }) {
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
-              Tervalidasi SHA-256
+              {t.immutableLedger || 'Buku besar permanen'}
             </p>
           </div>
           <span className="text-[10px] font-semibold text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 px-2 py-0.5 rounded-full">
-            Imutabel
+            SHA-256
           </span>
         </div>
       </div>
