@@ -16,8 +16,8 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">Sertifikat Analisis Mutu & QC (COA)</h3>
-              <p className="text-[11px] text-slate-500">Dokumen Uji Kelayakan Resmi Laboratorium</p>
+              <h3 className="font-bold text-slate-900 text-base">Laporan Pemeriksaan Produk Kayu</h3>
+              <p className="text-[11px] text-amber-700">Pratinjau data contoh; bukan sertifikat atau pengesahan resmi</p>
             </div>
           </div>
           <button 
@@ -34,10 +34,10 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
           {/* Top Banner */}
           <div className="text-center space-y-1 pb-4 border-b border-slate-200">
             <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-bold">
-              SERTIFIKAT ANALISIS & KELAYAKAN MUTU PRODUK
+              LAPORAN PEMERIKSAAN MUTU PRODUK KAYU
             </span>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              CERTIFICATE OF ANALYSIS & TRACEABILITY
+              WOOD PRODUCT INSPECTION & TRACEABILITY
             </h2>
             <p className="text-xs text-slate-500">Standar IPEC'26 • Kolej Komuniti Temerloh & Universitas Teknologi Digital Indonesia</p>
           </div>
@@ -55,7 +55,7 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
                 <p><span className="text-slate-500">Batch No:</span> <strong className="text-teal-800">{batch.batchNumber}</strong></p>
                 <p><span className="text-slate-500">SKU Code:</span> {batch.sku}</p>
                 <p><span className="text-slate-500">Tgl Rilis:</span> {batch.manufactureDate}</p>
-                <p><span className="text-slate-500">Kadaluarsa:</span> {batch.expiryDate}</p>
+                <p><span className="text-slate-500">Masa garansi/layanan:</span> {batch.expiryDate}</p>
               </div>
             </div>
 
@@ -71,16 +71,16 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
                   <span className="font-mono font-bold text-emerald-700">{batch.qcScore}% ({batch.qcStatus})</span>
                 </div>
                 <div className="px-4 py-2.5 flex justify-between items-center">
-                  <span className="text-slate-700">Ketertelusuran Bahan Mentah</span>
-                  <span className="font-mono font-bold text-teal-800">100% Terverifikasi ({batch.materials.length} Pemasok)</span>
+                  <span className="text-slate-700">Asal dan lot bahan kayu</span>
+                  <span className="font-mono font-bold text-teal-800">{batch.materials.length} komponen tercatat</span>
                 </div>
                 <div className="px-4 py-2.5 flex justify-between items-center">
                   <span className="text-slate-700">Kepatuhan Standar ESG & Emisi</span>
                   <span className="font-mono font-bold text-slate-900">{batch.carbonRating}</span>
                 </div>
                 <div className="px-4 py-2.5 flex justify-between items-center">
-                  <span className="text-slate-700">Audit Integritas Data & Anti-Manipulasi</span>
-                  <span className="font-mono font-bold text-indigo-700">5/5 Aturan Terpenuhi</span>
+                  <span className="text-slate-700">Catatan audit dan perubahan data</span>
+                  <span className="font-mono font-bold text-indigo-700">Tersedia di sistem</span>
                 </div>
               </div>
             </div>
@@ -104,10 +104,10 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
               </div>
 
               <div className="text-center sm:text-right text-xs">
-                <p className="text-slate-500 text-[10px]">Lead Penjamin Mutu & Auditor:</p>
+                <p className="text-slate-500 text-[10px]">Petugas pemeriksa mutu:</p>
                 <p className="font-bold text-slate-900 mt-1 underline decoration-teal-600 underline-offset-4">{batch.qcInspector}</p>
                 <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 mt-1 font-mono font-medium">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Tervalidasi Resmi
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Data contoh
                 </span>
               </div>
             </div>
@@ -127,7 +127,7 @@ export default function CertificateModal({ isOpen, onClose, batch }) {
             onClick={() => window.print()}
             className="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-xs"
           >
-            <Printer className="w-4 h-4 text-white" /> Cetak Sertifikat COA
+            <Printer className="w-4 h-4 text-white" /> Cetak Laporan Pemeriksaan
           </button>
         </div>
 

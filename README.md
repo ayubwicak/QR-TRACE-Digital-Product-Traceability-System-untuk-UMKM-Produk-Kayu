@@ -1,7 +1,12 @@
-# 🚀 QR TRACE — Digital Product Passport & PostgreSQL Traceability Platform
+# 🚀 QR TRACE — Digital Product Traceability untuk UMKM Produk Kayu
+> **Tagline:** Dari Bahan Baku hingga Produk Jadi, Semua Terlacak.
 > **Dipersiapkan untuk:** INNOVATIVE PRODUCT EXHIBITION AND COMPETITION (IPEC'26)  
 > **Tema:** Teknologi & Digital | Sosial & Kelestarian  
 > **Kolaborasi:** Kolej Komuniti Temerloh & Universitas Teknologi Digital Indonesia (UTDI)
+
+QR TRACE membantu UMKM produk kayu mencatat spesies dan asal kayu, pemasok,
+dokumen sumber, lot bahan, tahapan pengeringan dan pengerjaan, pemeriksaan mutu,
+serta informasi perawatan produk melalui paspor digital dan label QR.
 
 ---
 
@@ -10,7 +15,7 @@
 Sistem menggunakan database relasional **PostgreSQL** dengan skema `qrtrace` untuk persistensi data industri yang reliabel:
 
 * **Tabel `qrtrace.batches`:**
-  Menyimpan seluruh metadata produk, nomor batch, brand, SKU, tanggal manufaktur, masa kadaluarsa, skor QC, rating karbon, tanda tangan hash, serta komposisi bahan baku (`materials` JSONB), linimasa proses (`timeline` JSONB), dan hasil analisis validasi (`ai_analysis` JSONB).
+  Menyimpan metadata produk kayu, nomor batch, brand, SKU, tanggal produksi, masa garansi/layanan, skor QC, rating karbon, tanda tangan hash, serta rincian bahan (`materials` JSONB), linimasa pengerjaan (`timeline` JSONB), dan hasil pemeriksaan (`ai_analysis` JSONB).
 * **Tabel `qrtrace.audit_logs`:**
   Menyimpan buku besar audit (*immutable audit trail*) untuk setiap tindakan operator, pendaftaran batch baru, pembaruan data, dan otorisasi persetujuan.
 

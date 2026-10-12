@@ -439,10 +439,10 @@ app.post('/api/batches', authenticateToken, requireRoles('Admin Rantai Pasok', '
       RETURNING *;
     `;
     const values = [
-      b.batchNumber, b.productName, b.brand || 'KKT AgroFarm', b.sku, b.category || 'F&B / Agrikultur',
+      b.batchNumber, b.productName, b.brand || 'UMKM Produk Kayu', b.sku, b.category || 'Furnitur Kayu',
       b.manufactureDate || new Date().toISOString().split('T')[0],
       b.expiryDate || new Date().toISOString().split('T')[0],
-      b.qcStatus || 'Lolos Uji Standar (Grade A)',
+      b.qcStatus || 'Lolos Pemeriksaan Mutu',
       b.qcScore || 98.0,
       b.qcInspector || req.user.name,
       b.carbonFootprint || '0.30 kg CO₂e / unit',
@@ -762,12 +762,12 @@ app.post('/api/ai/analyze-batch', authenticateToken, async (req, res) => {
     const aiResult = {
       confidenceScore: parseFloat(confidenceScore.toFixed(1)),
       riskLevel: isSafe ? 'AMAN' : 'PERLU_PERHATIAN',
-      ruleChecked: '12 Parameter SNI, ISO 22000 & ESG Standar Terpenuhi',
+      ruleChecked: 'Asal bahan, pemeriksaan mutu, dan SOP produksi kayu ditinjau',
       anomalyDetected: !isSafe,
-      summary: `Proses manufaktur '${productName || batchNumber}' memiliki konsistensi tinggi. Semua ${materialsCount} bahan baku terlacak ke koperasi lokal dan seluruh ${timelineCount} tahapan produksi tersertifikasi higienis.`,
+      summary: `Data produk '${productName || batchNumber}' mencakup ${materialsCount} bahan dan ${timelineCount} tahapan pengerjaan. Tinjau dokumen asal kayu, pemasok, serta hasil pemeriksaan sesuai SOP usaha.`,
       ecoScoreRecommendation: carbonRating 
-        ? `Jejak karbon (${carbonRating}) berada dalam batas optimal target dekarbonisasi industri hijau.`
-        : 'Disarankan menggunakan kemasan berbasis pati jagung/kertas daur ulang untuk menaikkan peringkat ESG ke Grade A.'
+        ? `Rating jejak karbon (${carbonRating}) tercatat. Lengkapi data volume kayu, jarak angkut, dan pemanfaatan sisa produksi.`
+        : 'Catat jenis dan volume kayu, jarak angkut, energi proses, serta pemanfaatan potongan untuk melengkapi informasi dampak lingkungan.'
     };
 
     res.json(aiResult);
@@ -821,7 +821,7 @@ app.get('/api/reports/batches/export', authenticateToken, async (req, res) => {
     const result = await pool.query('SELECT * FROM qrtrace.batches ORDER BY created_at DESC;');
     const batches = result.rows.map(formatBatchRow);
 
-    const headers = ['Nomor Batch', 'Nama Produk', 'Brand', 'SKU', 'Kategori', 'Tgl Produksi', 'Tgl Kadaluarsa', 'Skor QC', 'Status QC', 'Pemeriksa QC', 'Jejak Karbon', 'Hash Integritas'];
+    const headers = ['Nomor Batch', 'Nama Produk', 'Brand', 'SKU', 'Kategori', 'Tgl Produksi', 'Masa Garansi/Layanan', 'Skor QC', 'Status QC', 'Pemeriksa QC', 'Jejak Karbon', 'Hash Integritas'];
     const rows = batches.map((b) => [
       `"${b.batchNumber}"`,
       `"${b.productName}"`,

@@ -1,110 +1,124 @@
 export const INITIAL_BATCHES = [
   {
     batchNumber: 'BATCH-2026-X01',
-    productName: 'Kopi Robusta Temerloh Organik 250g',
-    category: 'F&B / Agrikultur',
-    brand: 'Kolej Komuniti Temerloh AgroFarm',
-    sku: 'KKT-KOP-250',
-    image: 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80',
+    productName: 'Meja Kopi Kayu Jati Solid',
+    category: 'Furnitur Kayu',
+    brand: 'Temerloh Kayu Lestari',
+    sku: 'TKL-MKJ-001',
+    image: 'https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&w=600&q=80',
     manufactureDate: '2026-10-01',
-    expiryDate: '2027-10-01',
-    qcStatus: 'Lolos Uji Standar (Grade A)',
+    expiryDate: '2028-10-01',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
     qcInspector: 'Ahmad Faiz, S.T. (Petugas Kontrol Mutu)',
     qcScore: 98.4,
-    carbonFootprint: '0.42 kg CO₂e / bungkus',
+    carbonFootprint: '18.4 kg CO₂e / unit',
     carbonRating: 'Kategori Hijau (Rendah Emisi)',
     verificationHash: '0x8f7a9d2c1e4b3a6f8810e927c44d18fa',
-    story: 'Dipetik langsung oleh petani lokal Temerloh pada ketinggian optimal. Menggunakan pupuk organik alami dan diproses dengan mesin sangrai hemat energi untuk menjaga cita rasa khas kopi nusantara.',
+    story: 'Meja kopi dibuat oleh pengrajin UMKM Temerloh menggunakan kayu jati dari pemasok dengan dokumen asal-usul yang tercatat. Paspor ini merangkum perjalanan kayu, proses pengerjaan, pemeriksaan mutu, dan informasi perawatan produk.',
     materials: [
-      { name: 'Biji Kopi Robusta Petik Merah', origin: 'Perkebunan Temerloh Hill, Pahang', supplier: 'Koperasi Petani Sejahtera', batchRef: 'RAW-KOP-881', verified: true },
-      { name: 'Kantong Kemasan Biodegradable', origin: 'Pusat Kemasan Ramah Lingkungan', supplier: 'PT Hijau Kemas Lestari', batchRef: 'PCK-BIO-102', verified: true }
+      { name: 'Papan kayu jati oven-kering', origin: 'Temerloh, Pahang', supplier: 'Penggergajian Kayu Lestari', batchRef: 'KAY-JATI-881', verified: true },
+      { name: 'Minyak pelapis berbasis air', origin: 'Pemasok bahan finishing lokal', supplier: 'Finishing Aman Nusantara', batchRef: 'FIN-WTR-102', verified: true },
+      { name: 'Sekrup dan sambungan logam', origin: 'Pusat komponen furnitur', supplier: 'Komponen Perabot Temerloh', batchRef: 'KMP-SS-204', verified: true }
     ],
     timeline: [
-      { step: 'Pemanenan & Sortasi Biji Kopi', date: '25 Sep 2026', operator: 'Tim Kebun & Logistik', desc: 'Biji kopi dipetik manual saat matang merah, disortir dengan kadar air 11.2% tanpa bahan kimia.', done: true },
-      { step: 'Penyangraian (Roasting)', date: '28 Sep 2026', operator: 'Master Roaster', desc: 'Disangrai pada profil medium-dark suhu 205°C untuk mengeluarkan aroma cokelat dan karamel alami.', done: true },
-      { step: 'Uji Laboratorium & Rasa', date: '29 Sep 2026', operator: 'Laboratorium Uji Mutu', desc: 'Uji kebersihan mikrobiologi 0 CFU dan uji rasa (cupping score 84.5) memenuhi standar kelayakan pangan.', done: true },
-      { step: 'Pengemasan & Penempelan QR', date: '01 Okt 2026', operator: 'Lini Pengemasan 02', desc: 'Kemasan ditutup rapat dengan segel vakum dan ditempel stiker QR Trace untuk verifikasi pembeli.', done: true }
+      { step: 'Penerimaan kayu dan verifikasi dokumen', date: '25 Sep 2026', operator: 'Petugas Penerimaan Bahan', desc: 'Jenis kayu, volume, pemasok, dan dokumen asal-usul dicocokkan dengan catatan pembelian.', done: true },
+      { step: 'Pengeringan dan pemotongan', date: '28 Sep 2026', operator: 'Operator Produksi', desc: 'Kayu dikeringkan dan dipotong sesuai ukuran kerja; kadar air dicatat sebelum proses perakitan.', done: true },
+      { step: 'Perakitan, pengamplasan, dan finishing', date: '29 Sep 2026', operator: 'Tim Pengrajin', desc: 'Komponen dirakit, sambungan diperiksa, lalu permukaan diamplas dan diberi lapisan finishing.', done: true },
+      { step: 'Pemeriksaan akhir dan penerbitan QR', date: '01 Okt 2026', operator: 'Petugas Kontrol Mutu', desc: 'Dimensi, kestabilan, kualitas permukaan, dan identitas batch diperiksa sebelum label QR dipasang.', done: true }
     ],
     aiAnalysis: {
       confidenceScore: 98.5,
       riskLevel: 'AMAN',
       ruleChecked: 'Semua Standar Mutu Terpenuhi',
       anomalyDetected: false,
-      summary: 'Data proses produksi konsisten. Kadar air dan parameter suhu sangrai berada dalam batas standar mutu pangan SNI & ISO 22000.',
-      ecoScoreRecommendation: 'Bahan baku berasal dari kebun berjarak kurang dari 45 km, mendukung pengurangan jejak karbon logistik kampus hijau.'
+      summary: 'Data asal kayu, pemasok, tahapan pengerjaan, dan hasil pemeriksaan produk tercatat konsisten.',
+      ecoScoreRecommendation: 'Catat spesies, volume, jarak angkut, dan dokumen legalitas bahan untuk memperkuat informasi dampak lingkungan.'
     }
   },
   {
     batchNumber: 'BATCH-2026-B02',
-    productName: 'Sabun Herbal Minyak Atsiri Serai 100g',
-    category: 'Personal Care & Herbal',
-    brand: 'UTDI BioLab x Komuniti Temerloh',
-    sku: 'UTDI-SBN-100',
-    image: 'https://images.unsplash.com/photo-1607006314144-88f98a2e58c0?auto=format&fit=crop&w=600&q=80',
+    productName: 'Kursi Makan Kayu Mahoni',
+    category: 'Furnitur Kayu',
+    brand: 'Bengkel Perabot Mahoni',
+    sku: 'BPM-KMM-002',
+    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=600&q=80',
     manufactureDate: '2026-10-02',
     expiryDate: '2028-10-02',
-    qcStatus: 'Lolos Uji Standar (Grade A+)',
-    qcInspector: 'Dr. Siti Nurhaliza (Spesialis Formulasi)',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A+)',
+    qcInspector: 'Siti Nurhaliza (Inspektur Produk)',
     qcScore: 99.1,
-    carbonFootprint: '0.18 kg CO₂e / batang',
-    carbonRating: 'Kategori Hijau (Sangat Rendah Emisi)',
+    carbonFootprint: '12.7 kg CO₂e / unit',
+    carbonRating: 'Kategori Hijau (Rendah Emisi)',
     verificationHash: '0x3c91e847a102b55f9a2e6178cd92b450',
-    story: 'Diformulasikan secara tradisional dari minyak kelapa murni dan distilasi serai wangi alami lokal. Bebas detergen sintetis SLS dan paraben, lembut serta aman untuk semua jenis kulit.',
+    story: 'Kursi makan mahoni diproduksi dalam skala UMKM dengan sambungan kayu yang diperiksa sebelum finishing. Catatan batch menghubungkan bahan dari pemasok hingga produk siap kirim.',
     materials: [
-      { name: 'Minyak Kelapa Murni (VCO Asli)', origin: 'Sentra VCO Komuniti Temerloh', supplier: 'Koperasi Tani Makmur', batchRef: 'VCO-909', verified: true },
-      { name: 'Minyak Atsiri Serai Wangi', origin: 'Penyulingan Atsiri Alami', supplier: 'CV Atsiri Alami Nusantara', batchRef: 'EO-334', verified: true }
+      { name: 'Kayu mahoni gergajian', origin: 'Kilang kayu berdaftar, Pahang', supplier: 'Pembekal Kayu Mahoni Setempat', batchRef: 'KAY-MHN-909', verified: true },
+      { name: 'Perekat sambungan kayu', origin: 'Pemasok bahan pertukangan', supplier: 'Bahan Bina Pilihan', batchRef: 'PRK-WD-334', verified: true },
+      { name: 'Bantalan kaki pelindung lantai', origin: 'Pemasok komponen furnitur', supplier: 'Aksesori Perabot Lestari', batchRef: 'AKS-FTR-115', verified: true }
     ],
     timeline: [
-      { step: 'Pencampuran Bahan Alami (Cold Process)', date: '27 Sep 2026', operator: 'Tim Formulasi Herbal', desc: 'Pencampuran minyak kelapa dan ekstrak atsiri pada suhu kamar untuk menjaga nutrisi alami.', done: true },
-      { step: 'Masa Pematangan Sabun (Curing)', date: '30 Sep 2026', operator: 'Ruang Pematangan', desc: 'Sabun didiamkan selama 21 hari dengan sirkulasi udara alami hingga busa dan tekstur terbentuk sempurna.', done: true },
-      { step: 'Pemeriksaan pH & Uji Keamanan Kulit', date: '01 Okt 2026', operator: 'Laboratorium Uji Klinis', desc: 'pH sabun terukur 7.2 (netral dan lembut), terbukti bebas iritasi pada pengujian kulit.', done: true },
-      { step: 'Bungkus Kertas Daur Ulang & QR', date: '02 Okt 2026', operator: 'Lini Kemas Ramah Lingkungan', desc: 'Dibungkus kertas daur ulang bebas plastik dengan segel nomor batch resmi.', done: true }
+      { step: 'Verifikasi kayu dan pemotongan komponen', date: '27 Sep 2026', operator: 'Operator Pemotongan', desc: 'Ukuran komponen dicocokkan dengan lembar kerja dan sisa potongan dicatat untuk mengurangi limbah.', done: true },
+      { step: 'Pembentukan sambungan dan perakitan', date: '30 Sep 2026', operator: 'Tim Perakitan', desc: 'Sambungan diperiksa kesikuannya dan kursi diuji kestabilannya sebelum permukaan dirapikan.', done: true },
+      { step: 'Pengamplasan dan pelapisan akhir', date: '01 Okt 2026', operator: 'Tim Finishing', desc: 'Permukaan diamplas bertahap dan lapisan akhir diperiksa agar rata serta bebas cacat visual.', done: true },
+      { step: 'Pemeriksaan beban dan pelabelan QR', date: '02 Okt 2026', operator: 'Petugas Kontrol Mutu', desc: 'Konstruksi, sambungan, dan identitas produk diperiksa sebelum label paspor QR dipasang.', done: true }
     ],
     aiAnalysis: {
       confidenceScore: 99.2,
       riskLevel: 'AMAN',
       ruleChecked: 'Semua Standar Mutu Terpenuhi',
       anomalyDetected: false,
-      summary: 'Bebas detergen sintetis. Nilai pH dan waktu pematangan sabun terverifikasi optimal tanpa deviasi.',
-      ecoScoreRecommendation: 'Penggunaan kemasan kertas daur ulang membantu target kampus bebas sampah plastik.'
+      summary: 'Dokumen pemasok, urutan proses, dan hasil pemeriksaan sambungan kursi tercatat tanpa perbedaan.',
+      ecoScoreRecommendation: 'Catat pemanfaatan kembali potongan kayu dan jenis finishing untuk melengkapi data keberlanjutan.'
     }
   },
   {
     batchNumber: 'BATCH-2026-F03',
-    productName: 'Madu Kelulut Asli Hutan Tropis 350g',
-    category: 'Nutraceutical / Superfood',
-    brand: 'KKT Madu Alami',
-    sku: 'KKT-MD-350',
-    image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80',
+    productName: 'Talenan Kayu Akasia',
+    category: 'Kerajinan Kayu',
+    brand: 'Karya Kayu Komuniti',
+    sku: 'KKK-TKA-003',
+    image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80',
     manufactureDate: '2026-10-03',
     expiryDate: '2028-10-03',
-    qcStatus: 'Lolos Uji Standar (Grade A)',
-    qcInspector: 'Ir. Hendra Wijaya (Pemeriksa Keamanan Pangan)',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
+    qcInspector: 'Hendra Wijaya (Petugas Kontrol Mutu)',
     qcScore: 97.5,
-    carbonFootprint: '0.28 kg CO₂e / botol',
+    carbonFootprint: '1.8 kg CO₂e / unit',
     carbonRating: 'Kategori Hijau (Rendah Emisi)',
     verificationHash: '0x7e29b451fa80c12e93d8b24168ee3a01',
-    story: 'Madu murni dari lebah tanpa sengat (Trigona) yang dipanen higienis dari nektar bunga liar hutan tropis. Kaya enzim aktif dan antioksidan alami untuk daya tahan tubuh.',
+    story: 'Talenan akasia dibuat dari potongan kayu yang dipilih dan dibentuk oleh pengrajin lokal. Paspor mencatat asal bahan, proses pengamplasan, lapisan pelindung, dan petunjuk perawatan.',
     materials: [
-      { name: 'Madu Mentah Kelulut Segar', origin: 'Hutan Konservasi Komuniti', supplier: 'Kelompok Peternak Lebah Lestari', batchRef: 'RAW-HON-404', verified: true },
-      { name: 'Botol Kaca Gelap Pelindung Nutrisi', origin: 'Pusat Kemas Higienis', supplier: 'PT Prima Kemasindo', batchRef: 'GLS-UV-88', verified: true }
+      { name: 'Papan kayu akasia', origin: 'Temerloh, Pahang', supplier: 'Pemasok Kayu Akasia Lokal', batchRef: 'KAY-AKS-404', verified: true },
+      { name: 'Minyak pelindung permukaan', origin: 'Pemasok finishing berbasis air', supplier: 'Finishing Aman Nusantara', batchRef: 'FIN-ACA-088', verified: true }
     ],
     timeline: [
-      { step: 'Pemanenan Higienis & Steril', date: '28 Sep 2026', operator: 'Peternak Kelulut', desc: 'Penyedotan madu steril langsung dari sarang kayu tanpa kontak tangan.', done: true },
-      { step: 'Penyaringan Alami Tanpa Pemanasan', date: '30 Sep 2026', operator: 'Lini Filtrasi Higienis', desc: 'Disaring mikro tanpa pemanasan agar enzim diastase dan khasiat madu tetap hidup utuh.', done: true },
-      { step: 'Uji Kemurnian & Laboratorium', date: '02 Okt 2026', operator: 'Laboratorium Uji Pangan', desc: 'Hasil uji menunjukkan 100% madu murni tanpa campuran gula tebu tambahan.', done: true },
-      { step: 'Pembotolan & Pemasangan Segel QR', date: '03 Okt 2026', operator: 'Lini Botol Steril', desc: 'Pengisian ke botol kaca kedap udara dengan nomor identitas QR Trace digital.', done: true }
+      { step: 'Pemeriksaan bahan dan pemilihan serat', date: '28 Sep 2026', operator: 'Pengrajin Kayu', desc: 'Papan akasia diperiksa dari retak, mata kayu, dan cacat permukaan sebelum dipotong.', done: true },
+      { step: 'Pemotongan bentuk dan pembulatan tepi', date: '30 Sep 2026', operator: 'Operator Produksi', desc: 'Bentuk talenan dipotong sesuai pola, lalu tepi dibulatkan untuk kenyamanan penggunaan.', done: true },
+      { step: 'Pengamplasan dan aplikasi minyak pelindung', date: '02 Okt 2026', operator: 'Tim Finishing', desc: 'Permukaan diamplas halus dan diberi lapisan pelindung sesuai spesifikasi bahan.', done: true },
+      { step: 'Pemeriksaan permukaan dan penerbitan QR', date: '03 Okt 2026', operator: 'Petugas Kontrol Mutu', desc: 'Kerataan permukaan, ukuran, dan identitas batch diperiksa sebelum produk dikemas.', done: true }
     ],
     aiAnalysis: {
       confidenceScore: 97.8,
       riskLevel: 'AMAN',
       ruleChecked: 'Semua Standar Mutu Terpenuhi',
       anomalyDetected: false,
-      summary: 'Data spektrum kemurnian madu terkonfirmasi 100% asli tanpa pemalsuan pemanis.',
-      ecoScoreRecommendation: 'Peternakan lebah kelulut membantu penyerbukan alami tanaman hutan sekitar kampus.'
+      summary: 'Asal papan, pemasok finishing, tahapan pengerjaan, dan pemeriksaan akhir tercatat dalam paspor produk.',
+      ecoScoreRecommendation: 'Catat persentase pemanfaatan potongan kayu serta instruksi perawatan untuk mendukung umur pakai produk.'
     }
   }
 ];
+
+export const WOOD_CATEGORY_ALIASES = {
+  materials: ['kayu olahan', 'komponen kayu', 'processed wood', 'wood components'],
+  furniture: ['furnitur', 'perabot', 'furniture'],
+  crafts: ['kerajinan', 'kraf', 'craft']
+};
+
+export const matchesWoodCategory = (category, filter) => {
+  if (filter === 'all') return true;
+  const normalizedCategory = category.toLowerCase();
+  return (WOOD_CATEGORY_ALIASES[filter] || []).some(alias => normalizedCategory.includes(alias));
+};
 
 export const INITIAL_AUDIT_LOGS = [
   {
@@ -113,7 +127,7 @@ export const INITIAL_AUDIT_LOGS = [
     actor: 'Ahmad Faiz (Petugas QC)',
     action: 'PERSETUJUAN_RILIS_BATCH',
     batchNumber: 'BATCH-2026-X01',
-    details: 'Menyetujui rilis batch kopi setelah verifikasi hasil lab kadar air 11.2% dan uji aroma.',
+    details: 'Menyetujui rilis batch meja jati setelah verifikasi dokumen asal kayu dan hasil pemeriksaan mutu.',
     status: 'TERVERIFIKASI',
     hash: '0xa19f...44b1'
   },
@@ -123,27 +137,27 @@ export const INITIAL_AUDIT_LOGS = [
     actor: 'Sistem Validasi Otomatis',
     action: 'PEMERIKSAAN_SOP',
     batchNumber: 'BATCH-2026-X01',
-    details: 'Pemeriksaan 4 tahapan produksi selesai. Parameter suhu dan kebersihan memenuhi standar ISO 22000.',
+    details: 'Pemeriksaan empat tahapan pembuatan meja jati selesai; pemasok, dimensi, dan pemeriksaan akhir tercatat.',
     status: 'TERCATAT',
     hash: '0x882c...91e0'
   },
   {
     id: 'LOG-1003',
     timestamp: '2026-10-02 14:15:40',
-    actor: 'Dr. Siti Nurhaliza (Spesialis Formulasi)',
+    actor: 'Siti Nurhaliza (Inspektur Produk)',
     action: 'VERIFIKASI_BAHAN_BAKU',
     batchNumber: 'BATCH-2026-B02',
-    details: 'Konfirmasi sertifikat analisis bahan VCO murni dari Koperasi Tani Makmur.',
+    details: 'Konfirmasi dokumen asal kayu mahoni dan identitas lot dari pemasok terdaftar.',
     status: 'TERVERIFIKASI',
     hash: '0x32cf...e871'
   },
   {
     id: 'LOG-1004',
     timestamp: '2026-10-03 09:10:22',
-    actor: 'Ir. Hendra Wijaya (Petugas Pangan)',
+    actor: 'Hendra Wijaya (Petugas Kontrol Mutu)',
     action: 'ESTIMASI_JEJAK_KARBON',
     batchNumber: 'BATCH-2026-F03',
-    details: 'Perhitungan jejak karbon 0.28 kg CO₂e diverifikasi memenuhi standar kampus ramah lingkungan.',
+    details: 'Data bahan dan estimasi jejak karbon talenan akasia ditinjau sebelum paspor produk diterbitkan.',
     status: 'TERVERIFIKASI',
     hash: '0xd410...56f2'
   }
@@ -160,7 +174,7 @@ export const AI_GOVERNANCE_RULES = [
   {
     id: 'ATURAN-02',
     name: 'Pencocokan Pemasok Terpercaya (Whitelist Verified)',
-    desc: 'Bahan baku yang dimasukkan wajib cocok dengan daftar petani/pemasok terverifikasi untuk mencegah bahan palsu atau tidak higienis.',
+    desc: 'Data pemasok kayu, spesies, volume, lot, dan dokumen asal-usul harus dicatat agar perjalanan bahan dapat ditelusuri.',
     enforcement: 'Pengecekan Otomatis Daftar Pemasok Resmi',
     status: 'AKTIF'
   },

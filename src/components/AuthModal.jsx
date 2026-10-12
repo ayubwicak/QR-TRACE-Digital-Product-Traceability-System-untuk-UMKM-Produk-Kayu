@@ -18,9 +18,9 @@ import { api } from '../api';
 const DEMO_ACCOUNTS = [
   {
     name: 'Ahmad Faiz',
-    email: 'faiz@kktagrofarm.id',
+    email: 'faiz@qrtrace.id',
     role: 'Petugas QC',
-    org: 'KKT AgroFarm',
+    org: 'UMKM Produk Kayu',
     password: 'password123'
   },
   {
@@ -57,7 +57,7 @@ export default function AuthModal({
   // Register form state
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
-  const [regOrg, setRegOrg] = useState('KKT AgroFarm');
+  const [regOrg, setRegOrg] = useState('UMKM Produk Kayu');
   const [regRole, setRegRole] = useState('Petugas QC');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
@@ -116,7 +116,7 @@ export default function AuthModal({
           name: formattedName,
           email: loginEmail,
           role: loginRole,
-          organization: 'KKT AgroFarm',
+          organization: 'UMKM Produk Kayu',
           loginTime: new Date().toLocaleTimeString('id-ID')
         };
         onLoginSuccess(user);

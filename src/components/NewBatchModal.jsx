@@ -19,30 +19,32 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
   const [formData, setFormData] = useState({
     batchNumber: `BATCH-2026-N0${currentBatchCount + 1}`,
     productName: '',
-    brand: 'Kolej Komuniti Temerloh InnoHub',
+    brand: 'UMKM Produk Kayu Temerloh',
     sku: `KKT-PRD-${Math.floor(100 + Math.random() * 900)}`,
-    category: 'F&B / Agrikultur',
+    category: 'Furnitur Kayu',
     manufactureDate: new Date().toISOString().split('T')[0],
     expiryDate: '2027-10-15',
-    qcStatus: 'Passed (Grade A+)',
-    qcInspector: 'Tim Penjamin Mutu KKT & UTDI',
+    qcStatus: 'Lolos Pemeriksaan Mutu',
+    qcInspector: 'Petugas Kontrol Mutu',
     qcScore: 98.6,
     carbonFootprint: '0.35 kg CO₂e / unit',
     carbonRating: 'A (Rendah Karbon)',
     image: '',
-    story: 'Diproduksi menggunakan bahan baku terverifikasi dengan standar pengolahan bersih dan ramah lingkungan.',
-    rawMaterial1: 'Bahan Baku Primer Grade Super',
-    rawOrigin1: 'Petani Lokal Temerloh',
-    rawSupplier1: 'Koperasi Komuniti Sentosa',
-    rawRef1: 'RAW-AUTO-01',
-    rawMaterial2: 'Kemasan Daur Ulang Ramah Lingkungan',
-    rawOrigin2: 'Pusat Kemas Hijau',
-    rawSupplier2: 'PT Kemas Lestari',
-    rawRef2: 'PCK-AUTO-02',
-    step1Desc: 'Pemeriksaan kadar kemurnian dan uji kualitas awal bahan.',
-    step2Desc: 'Pemrosesan utama dengan teknologi hemat energi & standar HACCP.',
-    step3Desc: 'Pengujian parameter laboratorium dan sertifikasi QC.',
-    step4Desc: 'Pengemasan higienis dan penempelan paspor QR Trace.'
+    story: 'Produk kayu UMKM dengan asal bahan, proses pengerjaan, hasil pemeriksaan, dan informasi perawatan yang tercatat.',
+    rawMaterial1: '',
+    rawOrigin1: '',
+    rawSupplier1: '',
+    rawRef1: '',
+    rawVerified1: false,
+    rawMaterial2: '',
+    rawOrigin2: '',
+    rawSupplier2: '',
+    rawRef2: '',
+    rawVerified2: false,
+    step1Desc: 'Periksa spesies, volume, kondisi kayu, pemasok, dan dokumen asal-usul.',
+    step2Desc: 'Catat pengeringan, pemotongan, pembentukan, serta perakitan komponen kayu.',
+    step3Desc: 'Periksa kadar air sesuai spesifikasi, dimensi, sambungan, dan kualitas permukaan.',
+    step4Desc: 'Catat finishing, pengemasan, petunjuk perawatan, dan pemasangan label QR.'
   });
 
   if (!isOpen) return null;
@@ -85,7 +87,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const defaultFallbackImage = 'https://images.unsplash.com/photo-1587734195503-904fca47e0e9?auto=format&fit=crop&w=600&q=80';
+    const defaultFallbackImage = 'https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&w=600&q=80';
     const newBatchObj = {
       batchNumber: formData.batchNumber,
       productName: formData.productName,
@@ -108,29 +110,29 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
           origin: formData.rawOrigin1,
           supplier: formData.rawSupplier1,
           batchRef: formData.rawRef1,
-          verified: true
+          verified: formData.rawVerified1
         },
         {
           name: formData.rawMaterial2,
           origin: formData.rawOrigin2,
           supplier: formData.rawSupplier2,
           batchRef: formData.rawRef2,
-          verified: true
+          verified: formData.rawVerified2
         }
-      ],
+      ].filter(material => [material.name, material.origin, material.supplier, material.batchRef].some(value => value.trim())),
       timeline: [
-        { step: 'Penerimaan & Uji Bahan Baku', date: formData.manufactureDate, operator: 'Unit Logistik', desc: formData.step1Desc, done: true },
-        { step: 'Proses Manufaktur Inti', date: formData.manufactureDate, operator: 'Lini Produksi 01', desc: formData.step2Desc, done: true },
-        { step: 'Inspeksi & Uji Laboratorium (QC)', date: formData.manufactureDate, operator: 'Lab Penjamin Mutu', desc: formData.step3Desc, done: true },
-        { step: 'Packaging & Cetak Label QR Trace', date: formData.manufactureDate, operator: 'Unit Kemas', desc: formData.step4Desc, done: true }
+        { step: 'Penerimaan dan verifikasi kayu', date: formData.manufactureDate, operator: 'Petugas Penerimaan Bahan', desc: formData.step1Desc, done: true },
+        { step: 'Pengolahan dan perakitan', date: formData.manufactureDate, operator: 'Bengkel Produksi', desc: formData.step2Desc, done: true },
+        { step: 'Pemeriksaan dimensi dan mutu', date: formData.manufactureDate, operator: 'Petugas Kontrol Mutu', desc: formData.step3Desc, done: true },
+        { step: 'Finishing, pengemasan, dan label QR', date: formData.manufactureDate, operator: 'Tim Penyelesaian Produk', desc: formData.step4Desc, done: true }
       ],
       aiAnalysis: {
         confidenceScore: 97.5,
         riskLevel: 'LOW',
-        ruleChecked: '5/5 Guardrails Passed',
+        ruleChecked: 'Asal kayu, proses, dan pemeriksaan produk ditinjau',
         anomalyDetected: false,
-        summary: `Batch ${formData.batchNumber} berhasil diverifikasi. Integritas data bahan baku dan parameter operasional memenuhi SOP.`,
-        ecoScoreRecommendation: 'Jalur pasokan lokal berhasil menekan emisi logistik hingga 22%.'
+        summary: `Batch ${formData.batchNumber} siap ditinjau. Pastikan dokumen asal kayu, pemasok, tahapan pengerjaan, dan hasil pemeriksaan sesuai catatan usaha.`,
+        ecoScoreRecommendation: 'Lengkapi data volume bahan, jarak angkut, energi produksi, dan pemanfaatan sisa potongan kayu.'
       }
     };
 
@@ -193,7 +195,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
               <input 
                 type="text"
                 required
-                placeholder="Contoh: Keripik Pisang Salai Organik 150g"
+                placeholder="Contoh: Meja makan kayu jati solid"
                 value={formData.productName}
                 onChange={e => setFormData({...formData, productName: e.target.value})}
                 className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-800 focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
@@ -220,10 +222,9 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
                 onChange={e => setFormData({...formData, category: e.target.value})}
                 className="w-full bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
               >
-                <option value="F&B / Agrikultur">F&B / Agrikultur</option>
-                <option value="Personal Care & Herbal">Personal Care & Herbal</option>
-                <option value="Nutraceutical / Superfood">Nutraceutical / Superfood</option>
-                <option value="Teknologi & Elektronik">Teknologi & Elektronik</option>
+                <option value="Kayu Olahan & Komponen">Kayu Olahan & Komponen</option>
+                <option value="Furnitur Kayu">Furnitur Kayu</option>
+                <option value="Kerajinan Kayu">Kerajinan Kayu</option>
               </select>
             </div>
 
@@ -238,7 +239,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
             </div>
 
             <div>
-              <label className="text-slate-700 font-medium block mb-1">Masa Kadaluarsa</label>
+              <label className="text-slate-700 font-medium block mb-1">Masa Garansi / Layanan</label>
               <input 
                 type="date"
                 value={formData.expiryDate}
@@ -325,33 +326,81 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
           </div>
 
           {/* Bahan Baku Ketertelusuran */}
-          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
             <span className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-              <Box className="w-3.5 h-3.5 text-teal-600" /> Ketertelusuran Bahan Baku (Supply Chain)
+              <Box className="w-3.5 h-3.5 text-teal-600" /> Asal Kayu dan Bahan Pendukung
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <input 
-                type="text"
-                placeholder="Nama Bahan Baku"
-                value={formData.rawMaterial1}
-                onChange={e => setFormData({...formData, rawMaterial1: e.target.value})}
-                className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
-              />
-              <input 
-                type="text"
-                placeholder="Asal Daerah"
-                value={formData.rawOrigin1}
-                onChange={e => setFormData({...formData, rawOrigin1: e.target.value})}
-                className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
-              />
-              <input 
-                type="text"
-                placeholder="Nama Supplier"
-                value={formData.rawSupplier1}
-                onChange={e => setFormData({...formData, rawSupplier1: e.target.value})}
-                className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
-              />
-            </div>
+            {[
+              {
+                number: 1,
+                title: 'Kayu utama',
+                name: 'rawMaterial1',
+                origin: 'rawOrigin1',
+                supplier: 'rawSupplier1',
+                reference: 'rawRef1',
+                verified: 'rawVerified1',
+                namePlaceholder: 'Spesies, grade, dan volume kayu',
+                referencePlaceholder: 'Nomor lot / dokumen asal kayu'
+              },
+              {
+                number: 2,
+                title: 'Bahan pendukung',
+                name: 'rawMaterial2',
+                origin: 'rawOrigin2',
+                supplier: 'rawSupplier2',
+                reference: 'rawRef2',
+                verified: 'rawVerified2',
+                namePlaceholder: 'Finishing, perekat, atau komponen',
+                referencePlaceholder: 'Nomor lot / dokumen pendukung'
+              }
+            ].map(material => (
+              <div key={material.number} className="space-y-2 rounded-lg border border-slate-200 bg-white p-3">
+                <p className="text-[11px] font-semibold text-slate-700">{material.title}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder={material.namePlaceholder}
+                    value={formData[material.name]}
+                    onChange={e => setFormData({ ...formData, [material.name]: e.target.value })}
+                    required={material.number === 1}
+                    className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Lokasi asal bahan"
+                    value={formData[material.origin]}
+                    onChange={e => setFormData({ ...formData, [material.origin]: e.target.value })}
+                    required={material.number === 1}
+                    className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Nama pemasok"
+                    value={formData[material.supplier]}
+                    onChange={e => setFormData({ ...formData, [material.supplier]: e.target.value })}
+                    required={material.number === 1}
+                    className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
+                  />
+                  <input
+                    type="text"
+                    placeholder={material.referencePlaceholder}
+                    value={formData[material.reference]}
+                    onChange={e => setFormData({ ...formData, [material.reference]: e.target.value })}
+                    required={material.number === 1}
+                    className="bg-white border border-slate-200 rounded-lg p-2 text-slate-800"
+                  />
+                </div>
+                <label className="flex items-center gap-2 text-[11px] text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={formData[material.verified]}
+                    onChange={e => setFormData({ ...formData, [material.verified]: e.target.checked })}
+                    className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                  />
+                  Dokumen sumber sudah diperiksa petugas
+                </label>
+              </div>
+            ))}
           </div>
 
           {/* Footer Submit */}

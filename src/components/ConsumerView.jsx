@@ -26,6 +26,8 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
 
   if (!batch) return null;
 
+  const checkedMaterialCount = batch.materials.filter(material => material.verified).length;
+
   const handleShare = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
@@ -137,7 +139,7 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
       {batch.story && (
         <div className="p-4 sm:p-5 bg-amber-50/70 dark:bg-amber-950/20 border-b border-amber-200/60 dark:border-amber-900/40 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
           <p className="font-bold text-amber-950 dark:text-amber-300 mb-1 flex items-center gap-1.5">
-            <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> Cerita Produk & Petani:
+            <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> Cerita Produk & Pengrajin:
           </p>
           <p className="italic text-slate-700 dark:text-slate-300 leading-relaxed">"{batch.story}"</p>
         </div>
@@ -184,8 +186,10 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
         {activeTab === 'materials' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
-              <span>Daftar Komposisi & Sumber Bahan Mentah Terverifikasi</span>
-              <span className="text-emerald-700 dark:text-emerald-400 font-bold">100% Lolos Uji Lab</span>
+              <span>Asal Kayu dan Bahan Pendukung</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold">
+                {checkedMaterialCount}/{batch.materials.length} dokumen ditinjau petugas
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,7 +198,7 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
                   <div className="flex justify-between items-start">
                     <h4 className="font-bold text-slate-900 dark:text-white text-base">{m.name}</h4>
                     <span className="text-xs font-mono text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">
-                      Ref: {m.batchRef}
+                      Lot / dokumen: {m.batchRef}
                     </span>
                   </div>
                   <p className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
@@ -203,6 +207,9 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 pl-5.5">
                     <strong>Pemasok Terdaftar:</strong> {m.supplier}
+                  </p>
+                  <p className={`text-[11px] font-semibold ${m.verified ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
+                    {m.verified ? 'Dokumen ditandai telah ditinjau petugas' : 'Dokumen belum ditinjau petugas'}
                   </p>
                 </div>
               ))}
@@ -214,7 +221,7 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
         {activeTab === 'timeline' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
-              <span>Kronologi Pemrosesan & Titik Kontrol Kritis (HACCP/SOP)</span>
+              <span>Kronologi Pengerjaan & Pemeriksaan Mutu (SOP)</span>
               <span className="text-emerald-700 dark:text-emerald-400 font-bold">{batch.timeline.length} Tahap Lolos</span>
             </div>
 
@@ -274,7 +281,7 @@ export default function ConsumerView({ batch, onBackToAdmin }) {
           <span className="text-xs font-bold text-slate-200">Diverifikasi oleh: {batch.qcInspector}</span>
         </div>
         <p className="text-xs text-slate-400 font-mono">
-          Platform QR Trace • KKT AgroFarm & UTDI Lab Traceability
+          QR Trace • Paspor Digital Produk Kayu UMKM
         </p>
       </div>
 

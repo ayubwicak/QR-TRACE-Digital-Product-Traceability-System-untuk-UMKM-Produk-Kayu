@@ -61,11 +61,11 @@ export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) 
       materials: [
         ...formData.materials,
         {
-          name: 'Bahan Tambahan Baru',
-          origin: 'Supplier Lokal',
-          supplier: 'CV Mitra Berkualitas',
-          batchRef: `RAW-EXT-${Math.floor(100 + Math.random() * 900)}`,
-          verified: true
+          name: '',
+          origin: '',
+          supplier: '',
+          batchRef: `KAY-LOT-${Math.floor(100 + Math.random() * 900)}`,
+          verified: false
         }
       ]
     });
@@ -270,7 +270,7 @@ export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) 
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-slate-900 flex items-center gap-1.5 uppercase tracking-wide text-xs">
-                <Box className="w-3.5 h-3.5 text-teal-600" /> Daftar Bahan Baku ({formData.materials.length})
+                <Box className="w-3.5 h-3.5 text-teal-600" /> Kayu dan Bahan Pendukung ({formData.materials.length})
               </span>
               <button
                 type="button"
@@ -284,33 +284,51 @@ export default function EditBatchModal({ isOpen, onClose, batch, onSaveBatch }) 
             <div className="space-y-2.5">
               {formData.materials.map((mat, idx) => (
                 <div key={idx} className="bg-white p-3 rounded-lg border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                  <div className="sm:col-span-4">
+                  <div className="sm:col-span-3">
                     <input 
                       type="text"
-                      placeholder="Nama Bahan"
+                      placeholder="Spesies kayu / bahan / volume"
                       value={mat.name}
                       onChange={e => handleUpdateMaterial(idx, 'name', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-slate-800"
                     />
                   </div>
-                  <div className="sm:col-span-3">
+                  <div className="sm:col-span-2">
                     <input 
                       type="text"
-                      placeholder="Asal Lokasi"
+                      placeholder="Lokasi asal"
                       value={mat.origin}
                       onChange={e => handleUpdateMaterial(idx, 'origin', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-slate-700"
                     />
                   </div>
-                  <div className="sm:col-span-4">
+                  <div className="sm:col-span-2">
                     <input 
                       type="text"
-                      placeholder="Nama Pemasok"
+                      placeholder="Pemasok"
                       value={mat.supplier}
                       onChange={e => handleUpdateMaterial(idx, 'supplier', e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-slate-700"
                     />
                   </div>
+                  <div className="sm:col-span-2">
+                    <input
+                      type="text"
+                      placeholder="No. lot / dokumen asal"
+                      value={mat.batchRef || ''}
+                      onChange={e => handleUpdateMaterial(idx, 'batchRef', e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md p-1.5 text-slate-700"
+                    />
+                  </div>
+                  <label className="sm:col-span-2 flex items-center gap-1.5 text-[10px] text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(mat.verified)}
+                      onChange={e => handleUpdateMaterial(idx, 'verified', e.target.checked)}
+                      className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                    />
+                    Dokumen diperiksa
+                  </label>
                   <div className="sm:col-span-1 flex justify-end">
                     <button
                       type="button"

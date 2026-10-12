@@ -54,7 +54,7 @@ export default function LabelPrintModal({ isOpen, onClose, batch }) {
               <p><strong>BATCH:</strong> {batch.batchNumber}</p>
               <p><strong>SKU:</strong> {batch.sku}</p>
               <p><strong>MFG:</strong> {batch.manufactureDate}</p>
-              <p><strong>EXP:</strong> {batch.expiryDate}</p>
+              <p><strong>GARANSI:</strong> {batch.expiryDate}</p>
               <p className="text-[10px] text-slate-500 mt-2 font-sans italic">
                 Pindai QR untuk verifikasi asal bahan & riwayat produksi.
               </p>

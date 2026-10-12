@@ -10,13 +10,13 @@ import {
 export default function EcoCalculatorModal({ isOpen, onClose, batch, onUpdateEcoData }) {
   const [distanceKm, setDistanceKm] = useState(45);
   const [transportMode, setTransportMode] = useState('ev');
-  const [packagingType, setPackagingType] = useState('biodegradable');
+  const [packagingType, setPackagingType] = useState('recycled_cardboard');
   const [renewableEnergyPercent, setRenewableEnergyPercent] = useState(80);
 
   if (!isOpen || !batch) return null;
 
   const transportFactor = transportMode === 'ev' ? 0.02 : transportMode === 'hybrid' ? 0.08 : 0.18;
-  const packagingFactor = packagingType === 'biodegradable' ? 0.05 : packagingType === 'recycled_paper' ? 0.09 : 0.35;
+  const packagingFactor = packagingType === 'recycled_cardboard' ? 0.09 : packagingType === 'new_cardboard' ? 0.16 : 0.35;
   const energyFactor = (100 - renewableEnergyPercent) * 0.002;
 
   const totalCO2 = ((distanceKm * transportFactor * 0.05) + packagingFactor + energyFactor).toFixed(2);
@@ -51,7 +51,7 @@ export default function EcoCalculatorModal({ isOpen, onClose, batch, onUpdateEco
             </div>
             <div>
               <h3 className="font-bold text-slate-900 text-base">Kalkulator Jejak Karbon & ESG (SDG 12)</h3>
-              <p className="text-[11px] text-slate-500">Estimasi Emisi Rantai Pasok & Efisiensi Material</p>
+              <p className="text-[11px] text-slate-500">Estimasi logistik, pengemasan, dan energi proses kayu</p>
             </div>
           </div>
           <button 
@@ -81,7 +81,7 @@ export default function EcoCalculatorModal({ isOpen, onClose, batch, onUpdateEco
           {/* Distance Slider */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-slate-700 font-medium">
-              <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-teal-600" /> Radius Pasokan Bahan Baku:</span>
+              <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-teal-600" /> Jarak Angkut Rata-rata Bahan Kayu:</span>
               <span className="font-mono text-teal-700 font-bold">{distanceKm} km</span>
             </div>
             <input 
@@ -125,9 +125,9 @@ export default function EcoCalculatorModal({ isOpen, onClose, batch, onUpdateEco
             <label className="text-slate-700 font-medium block">Material Kemasan Produk:</label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'biodegradable', label: 'Bio-Degradable Pouch' },
-                { id: 'recycled_paper', label: 'Kertas Daur Ulang' },
-                { id: 'plastic', label: 'Plastik Standar' }
+                { id: 'recycled_cardboard', label: 'Kardus Daur Ulang' },
+                { id: 'new_cardboard', label: 'Kardus Baru' },
+                { id: 'plastic_wrap', label: 'Plastik Pelindung' }
               ].map(p => (
                 <button
                   key={p.id}
@@ -144,6 +144,10 @@ export default function EcoCalculatorModal({ isOpen, onClose, batch, onUpdateEco
               ))}
             </div>
           </div>
+
+          <p className="text-[10px] leading-relaxed text-slate-500">
+            Estimasi ini memakai faktor sederhana untuk demo. Nilainya belum mencakup jenis dan volume kayu, pengeringan, maupun data energi aktual; jangan gunakan sebagai sertifikasi atau inventaris emisi resmi.
+          </p>
 
           {/* Renewable Energy Factory */}
           <div className="space-y-1.5">

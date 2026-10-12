@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 import { TRANSLATIONS } from '../data/i18n';
+import { matchesWoodCategory } from '../data/mockData';
 
 export default function ProductCatalogView({
   batches,
@@ -55,7 +56,7 @@ export default function ProductCatalogView({
       await api.exportBatchesCSV();
     } catch (_err) {
       // Fallback export jika offline
-      const headers = ['Nomor Batch,Nama Produk,Brand,SKU,Kategori,Tgl Rilis,Kadaluarsa,Skor QC,Status QC,Pemeriksa,Jejak Karbon'];
+      const headers = ['Nomor Batch,Nama Produk,Brand,SKU,Kategori,Tgl Rilis,Masa Garansi/Layanan,Skor QC,Status QC,Pemeriksa,Jejak Karbon'];
       const rows = batches.map(b => `"${b.batchNumber}","${b.productName}","${b.brand}","${b.sku}","${b.category}","${b.manufactureDate}","${b.expiryDate}",${b.qcScore},"${b.qcStatus}","${b.qcInspector}","${b.carbonFootprint}"`);
       const csv = [headers, ...rows].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -75,14 +76,7 @@ export default function ProductCatalogView({
       b.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.brand.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCat = 
-      categoryFilter === 'all' ||
-      ({
-        food: ['f&b', 'agrikultur', 'agriculture', 'food', 'makanan'],
-        care: ['personal care', 'perawatan diri', 'penjagaan diri', 'herbal'],
-        nutrition: ['nutraceutical', 'nutraseutikal', 'nutrition', 'nutrisi', 'superfood'],
-        technology: ['teknologi', 'technology', 'electronics', 'elektronik']
-      }[categoryFilter] || []).some(alias => b.category.toLowerCase().includes(alias));
+    const matchesCat = matchesWoodCategory(b.category, categoryFilter);
 
     return matchesSearch && matchesCat;
   });

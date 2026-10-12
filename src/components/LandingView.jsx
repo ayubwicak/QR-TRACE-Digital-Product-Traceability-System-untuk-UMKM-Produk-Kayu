@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TRANSLATIONS } from '../data/i18n';
+import { matchesWoodCategory } from '../data/mockData';
 import { 
   QrCode, 
   ShieldCheck, 
@@ -46,14 +47,7 @@ export default function LandingView({
                        b.batchNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                        b.brand.toLowerCase().includes(searchTerm.toLowerCase());
     if (activeCategoryTab === 'all') return matchQuery;
-    const categoryAliases = {
-      food: ['f&b', 'agrikultur', 'agriculture', 'food', 'makanan'],
-      care: ['personal care', 'perawatan diri', 'penjagaan diri', 'herbal'],
-      nutrition: ['nutraceutical', 'nutraseutikal', 'nutrition', 'nutrisi', 'superfood'],
-      technology: ['teknologi', 'technology', 'electronics', 'elektronik']
-    };
-    const aliases = categoryAliases[activeCategoryTab] || [];
-    return matchQuery && aliases.some(alias => b.category.toLowerCase().includes(alias));
+    return matchQuery && matchesWoodCategory(b.category, activeCategoryTab);
   });
 
   const totalBatches = batches.length;

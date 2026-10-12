@@ -186,7 +186,7 @@ export default function BatchDetail({
 
           <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
             <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-400" /> Masa Kadaluarsa
+              <Clock className="w-3.5 h-3.5 text-slate-400" /> Masa Garansi / Layanan
             </p>
             <p className="text-xs sm:text-sm font-bold text-slate-900 mt-1 font-mono">{batch.expiryDate}</p>
           </div>
@@ -226,7 +226,7 @@ export default function BatchDetail({
             <h3 className="font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
               <Box className="w-4 h-4 text-emerald-700" /> Asal Usul Bahan Baku (Raw Material Traceability)
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Seluruh komponen terverifikasi dari petani & pemasok resmi</p>
+            <p className="text-xs text-slate-500 mt-0.5">Telusuri spesies kayu, lot, pemasok, lokasi asal, dan dokumen pendukung</p>
           </div>
           <span className="text-xs bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full font-semibold border border-emerald-200">
             {batch.materials.length} Komponen Terdaftar
@@ -246,8 +246,13 @@ export default function BatchDetail({
                   </span>
                   <h4 className="text-xs sm:text-sm font-bold text-slate-900 mt-1.5">{mat.name}</h4>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[11px] bg-white text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold shadow-2xs">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Teruji Asli
+                <span className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full border font-semibold shadow-2xs ${
+                  mat.verified
+                    ? 'bg-white text-emerald-800 border-emerald-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
+                }`}>
+                  <CheckCircle2 className={`w-3 h-3 ${mat.verified ? 'text-emerald-600' : 'text-amber-600'}`} />
+                  {mat.verified ? 'Dokumen ditinjau' : 'Belum ditinjau'}
                 </span>
               </div>
 
@@ -272,7 +277,7 @@ export default function BatchDetail({
             <h3 className="font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
               <Factory className="w-4 h-4 text-emerald-700" /> Riwayat Tahapan Pengolahan & SOP
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Kronologi proses dari panen hingga pengemasan siap edar</p>
+            <p className="text-xs text-slate-500 mt-0.5">Kronologi proses dari penerimaan kayu hingga produk jadi siap dikirim</p>
           </div>
           <span className="text-xs text-emerald-800 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
             {batch.timeline.length} Tahapan Lengkap

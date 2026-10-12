@@ -18,7 +18,7 @@ export default function BatchList({
   setCategoryFilter,
   onCopyBatchId
 }) {
-  const categories = ['Semua', 'F&B', 'Personal Care', 'Nutraceutical'];
+  const categories = ['Semua', 'Kayu Olahan & Komponen', 'Furnitur Kayu', 'Kerajinan Kayu'];
 
   const getCategoryCount = (cat) => {
     if (cat === 'Semua') return batches.length;

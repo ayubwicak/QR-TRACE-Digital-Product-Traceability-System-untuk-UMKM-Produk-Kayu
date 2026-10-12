@@ -39,7 +39,7 @@ export default function StatsOverview({ batches, auditLogs, lang = 'id' }) {
       label: t.qaAutomation || 'Validasi Otomatis (QA)',
       value: '100%',
       caption: <><Lock className="h-3 w-3" /> {t.humanInTheLoopReady}</>,
-      badge: 'SOP HACCP',
+      badge: 'Asal Kayu Tercatat',
       icon: <FileCheck2 className="h-4 w-4" />,
       iconColor: 'text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-950/50'
     },

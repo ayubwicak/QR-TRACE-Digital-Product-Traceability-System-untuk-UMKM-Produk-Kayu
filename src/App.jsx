@@ -21,22 +21,62 @@ import { api } from './api';
 import confetti from 'canvas-confetti';
 import { ShieldCheck, Database, ArrowLeft, QrCode, ArrowRight, Globe2 } from 'lucide-react';
 
-export default function App() {
-  const [batches, setBatches] = useState(() => {
-    const saved = localStorage.getItem('qrtrace_batches');
-    return saved ? JSON.parse(saved) : INITIAL_BATCHES;
-  });
+const LEGACY_SAMPLE_NAMES = new Set([
+  'Kopi Robusta Temerloh Organik 250g',
+  'Sabun Herbal Minyak Atsiri Serai 100g',
+  'Madu Kelulut Asli Hutan Tropis 350g'
+]);
 
-  const [auditLogs, setAuditLogs] = useState(() => {
-    const saved = localStorage.getItem('qrtrace_audit_logs');
-    return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
+const LEGACY_SAMPLE_AUDIT_DETAILS = new Set([
+  'Menyetujui rilis batch kopi setelah verifikasi hasil lab kadar air 11.2% dan uji aroma.',
+  'Pemeriksaan 4 tahapan produksi selesai. Parameter suhu dan kebersihan memenuhi standar ISO 22000.',
+  'Konfirmasi sertifikat analisis bahan VCO murni dari Koperasi Tani Makmur.',
+  'Perhitungan jejak karbon 0.28 kg CO₂e diverifikasi memenuhi standar kampus ramah lingkungan.'
+]);
+
+const loadBatches = () => {
+  const saved = localStorage.getItem('qrtrace_batches');
+  if (!saved) return INITIAL_BATCHES;
+
+  const savedBatches = JSON.parse(saved);
+  return savedBatches.map(batch => {
+    if (!LEGACY_SAMPLE_NAMES.has(batch.productName)) return batch;
+    return INITIAL_BATCHES.find(sample => sample.batchNumber === batch.batchNumber) || batch;
   });
+};
+
+const loadAuditLogs = () => {
+  const saved = localStorage.getItem('qrtrace_audit_logs');
+  if (!saved) return INITIAL_AUDIT_LOGS;
+
+  const savedLogs = JSON.parse(saved);
+  return savedLogs.map(log => {
+    if (!LEGACY_SAMPLE_AUDIT_DETAILS.has(log.details)) return log;
+    return INITIAL_AUDIT_LOGS.find(sample => sample.id === log.id) || log;
+  });
+};
+
+const loadCurrentUser = () => {
+  const saved = localStorage.getItem('qrtrace_user');
+  if (!saved) return null;
+
+  const user = JSON.parse(saved);
+  return user.organization === 'KKT AgroFarm' || user.email === 'faiz@kktagrofarm.id'
+    ? {
+        ...user,
+        organization: 'UMKM Produk Kayu',
+        email: user.email === 'faiz@kktagrofarm.id' ? 'faiz@qrtrace.id' : user.email
+      }
+    : user;
+};
+
+export default function App() {
+  const [batches, setBatches] = useState(loadBatches);
+
+  const [auditLogs, setAuditLogs] = useState(loadAuditLogs);
 
   // Current authenticated user (null if guest/visitor)
-  const [currentUser, setCurrentUser] = useState(() => {
-    const savedUser = localStorage.getItem('qrtrace_user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [currentUser, setCurrentUser] = useState(loadCurrentUser);
 
   const [selectedBatch, setSelectedBatch] = useState(INITIAL_BATCHES[0]);
   // Initial View Mode: 'landing' (Informasi Sistem Pertama kali saat buka aplikasi)
@@ -95,7 +135,7 @@ export default function App() {
   const handleLoginSuccess = (userData) => {
     setCurrentUser(userData);
     localStorage.setItem('qrtrace_user', JSON.stringify(userData));
-    showToast('Selamat Datang!', `Berhasil masuk sebagai ${userData.name} (${userData.role}).`);
+    setToast(null);
     setViewMode('catalog'); // Navigate straight into Dashboard after login
   };
 
@@ -129,7 +169,7 @@ export default function App() {
     setCurrentUser(null);
     localStorage.removeItem('qrtrace_user');
     setViewMode('landing');
-    showToast('Keluar dari Akun', 'Anda telah keluar dari akun.', 'info');
+    setToast(null);
   };
 
   // Initial Database Sync from PostgreSQL

@@ -34,15 +34,15 @@ export default function AiCopilotCard({
     setIsScanning(true);
     setTimeout(() => {
       setIsScanning(false);
-      if (type === 'temp_spike') {
+      if (type === 'dimension_mismatch') {
         setScanResult({
           timestamp: new Date().toLocaleTimeString(),
           confidence: '98.9%',
-          guardrails: 'Peringatan: Ambang Batas Suhu Terlampaui',
+          guardrails: 'Peringatan: Dimensi Tidak Sesuai Spesifikasi',
           anomaly: true,
-          risk: 'Perhatian (Suhu Di Luar Batas)',
-          message: `Sensor suhu tahap roasting tercatat 232°C (Batas normal SOP: 205°C). Sistem QA menahan sertifikasi sampai diverifikasi ulang oleh Lead QC.`,
-          actionRequired: 'Pemeriksaan Manual Sensor Diperlukan'
+          risk: 'Perhatian (Dimensi Produk)',
+          message: `Hasil ukur komponen berbeda dari spesifikasi pada lembar kerja. Sistem menahan status pemeriksaan akhir sampai ukuran dan kesikuan diverifikasi petugas.`,
+          actionRequired: 'Ukur Ulang dan Tinjau Lembar Kerja'
         });
       } else if (type === 'supplier_mismatch') {
         setScanResult({
@@ -51,18 +51,18 @@ export default function AiCopilotCard({
           guardrails: 'Ditolak: Pemasok Belum Terdaftar Whitelist',
           anomaly: true,
           risk: 'Kritis (Ketertelusuran Gagal)',
-          message: `Pemasok bahan baku tidak ditemukan di daftar vendor terverifikasi ISO 22000. Penerbitan QR paspor ditahan otomatis.`,
-          actionRequired: 'Otorisasi Khusus Auditor Diperlukan'
+          message: `Pemasok atau dokumen asal-usul kayu tidak cocok dengan catatan lot bahan. Penerbitan paspor ditahan sampai asal bahan dan dokumen pendukung ditinjau.`,
+          actionRequired: 'Verifikasi Pemasok dan Dokumen Asal Kayu'
         });
       } else {
         setScanResult({
           timestamp: new Date().toLocaleTimeString(),
           confidence: '95.5%',
-          guardrails: 'Peringatan: Kadar Air Di Atas Standar',
+          guardrails: 'Peringatan: Kadar Air Di Atas Spesifikasi',
           anomaly: true,
           risk: 'Sedang',
-          message: `Kadar air terdeteksi 13.8% (Maksimal standar: 12.0%). Disarankan penyesuaian masa kadaluarsa menjadi 6 bulan.`,
-          actionRequired: 'Rekomendasi Penyesuaian Expiry Date'
+          message: `Kadar air kayu tercatat 18.3%, melebihi batas 12.0% pada spesifikasi batch contoh ini. Tinjau ulang proses pengeringan sebelum finishing.`,
+          actionRequired: 'Lanjutkan Pengeringan dan Ulangi Pengukuran'
         });
       }
     }, 450);
@@ -79,7 +79,7 @@ export default function AiCopilotCard({
         guardrails: 'Semua 5 Aturan Validasi Terpenuhi',
         anomaly: false,
         risk: 'LOLOS UJI MUTU',
-        message: `Integritas data batch ${batch.batchNumber} terverifikasi. Seluruh parameter pengujian lab, suhu pengolahan, dan ketertelusuran ${batch.materials.length} bahan baku memenuhi standar ISO 22000 & HACCP.`,
+        message: `Integritas data batch ${batch.batchNumber} terverifikasi. Data asal kayu, pemasok, ${batch.materials.length} komponen, proses pengerjaan, dan pemeriksaan produk tercatat konsisten.`,
         actionRequired: 'Data Siap Diterbitkan ke Paspor QR'
       });
     }, 350);
@@ -105,9 +105,9 @@ export default function AiCopilotCard({
   };
 
   const quickPrompts = [
-    'Periksa suhu pengolahan',
-    'Cek sertifikat pemasok',
-    'Verifikasi tanggal kadaluarsa'
+    'Periksa dokumen asal kayu',
+    'Cek kadar air dan proses pengeringan',
+    'Tinjau dimensi dan sambungan produk'
   ];
 
   return (
@@ -171,15 +171,15 @@ export default function AiCopilotCard({
 
         <div className="flex flex-wrap gap-2 pt-1">
           <button
-            onClick={() => handleSimulateAnomaly('temp_spike')}
+            onClick={() => handleSimulateAnomaly('dimension_mismatch')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 border shadow-2xs active:scale-95 ${
-              anomalyMode === 'temp_spike'
+              anomalyMode === 'dimension_mismatch'
                 ? 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/30'
                 : 'bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-slate-200 dark:border-slate-700 hover:border-amber-300'
             }`}
           >
             <Thermometer className="w-3.5 h-3.5 text-amber-500" />
-            Simulasi Deviasi Suhu
+            Simulasi Dimensi Tidak Sesuai
           </button>
 
           <button
@@ -249,7 +249,7 @@ export default function AiCopilotCard({
           </div>
 
           <div className="mt-3.5 pt-2.5 border-t border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-[11px]">
-            <span className="text-slate-500 dark:text-slate-400">Standar: ISO 22000 & HACCP</span>
+            <span className="text-slate-500 dark:text-slate-400">Pemeriksaan: Asal bahan & SOP produksi</span>
             <span className={`font-bold font-mono px-2 py-0.5 rounded-md ${
               scanResult?.anomaly 
                 ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300' 
@@ -324,7 +324,7 @@ export default function AiCopilotCard({
             <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400" />
             <input 
               type="text"
-              placeholder="Cari atau tanyakan data batch (contoh: 'Periksa kesesuaian SOP suhu dan masa simpan')..."
+              placeholder="Cari atau tanyakan data batch (contoh: 'Periksa asal kayu, kadar air, dan dimensi produk')..."
               value={customPrompt}
               onChange={e => setCustomPrompt(e.target.value)}
               className="w-full pl-8.5 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 text-slate-900 dark:text-white placeholder-slate-400 transition"
