@@ -16,9 +16,10 @@ import EcoCalculatorModal from './components/EcoCalculatorModal';
 import CertificateModal from './components/CertificateModal';
 import Toast from './components/Toast';
 import { INITIAL_BATCHES, INITIAL_AUDIT_LOGS } from './data/mockData';
+import { TRANSLATIONS } from './data/i18n';
 import { api } from './api';
 import confetti from 'canvas-confetti';
-import { ShieldCheck, Database, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Database, ArrowLeft, QrCode, ArrowRight, Globe2 } from 'lucide-react';
 
 export default function App() {
   const [batches, setBatches] = useState(() => {
@@ -41,7 +42,7 @@ export default function App() {
   // Initial View Mode: 'landing' (Informasi Sistem Pertama kali saat buka aplikasi)
   const [viewMode, setViewMode] = useState('landing'); // 'landing' | 'catalog' | 'detail' | 'consumer'
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('Semua');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [lang, setLang] = useState('id'); // 'id' | 'ms' | 'en'
   const [dbStatus, setDbStatus] = useState('CHECKING'); // 'CONNECTED' | 'OFFLINE'
   const [toast, setToast] = useState(null);
@@ -390,6 +391,9 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.id;
+  const footerCopy = t.footer;
+
   // VIEW MODE: STANDALONE DEDICATED CONSUMER MOBILE PASSPORT
   if (viewMode === 'consumer') {
     return (
@@ -402,17 +406,17 @@ export default function App() {
               className="text-xs font-semibold px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-teal-700 border border-slate-200 flex items-center gap-2 transition active:scale-95 shadow-xs whitespace-nowrap cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Kembali ke Dashboard Utama</span>
+              <span>{t.backToAdmin}</span>
             </button>
 
             <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="font-semibold text-slate-800">Pratinjau Paspor Digital (Tampilan HP)</span>
+              <span className="font-semibold text-slate-800">{t.consumerPassportPreview}</span>
             </div>
 
             {/* Quick Batch Selector */}
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-slate-400 hidden md:inline">Pilih Produk:</span>
+              <span className="text-[11px] text-slate-400 hidden md:inline">{t.chooseProduct}</span>
               <select
                 value={selectedBatch?.batchNumber}
                 onChange={(e) => {
@@ -440,7 +444,7 @@ export default function App() {
         </main>
 
         <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-200">
-          QR Trace © Paspor Digital Transparansi Produk • Mode Pemindaian Konsumen
+          QR Trace © {footerCopy.digitalPassport} • {t.consumerMode}
         </footer>
 
         {toast && (
@@ -476,7 +480,7 @@ export default function App() {
         />
 
         {/* Main Content Area */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <main className="mx-auto max-w-[1600px] space-y-8 px-4 py-8 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
           
           {/* VIEW MODE 0: INFORMASI LENGKAP SISTEM (PERTAMA KALI) */}
           {viewMode === 'landing' && (
@@ -489,6 +493,7 @@ export default function App() {
               onOpenScanner={() => setIsQrScannerOpen(true)}
               onSelectBatch={handleSelectBatch}
               onSimulateScan={handleSimulateScan}
+              dbStatus={dbStatus}
               lang={lang}
             />
           )}
@@ -496,6 +501,24 @@ export default function App() {
           {/* DASHBOARD VIEWS (CATALOG & DETAIL) */}
           {(viewMode === 'catalog' || viewMode === 'detail') && (
             <>
+              <section className="flex flex-col gap-3 border-b border-slate-200 pb-5 dark:border-slate-800 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700 dark:text-blue-300">
+                    QR Trace / {t.workspace}
+                  </p>
+                  <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                    {viewMode === 'catalog' ? t.dashboardTitle : t.detailTitle}
+                  </h1>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    {t.dashboardDescription}
+                  </p>
+                </div>
+                <span className={`inline-flex items-center gap-2 self-start rounded-full px-3 py-1.5 text-xs font-semibold sm:self-auto ${dbStatus === 'CONNECTED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : dbStatus === 'OFFLINE' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}>
+                  <span className={`h-2 w-2 rounded-full ${dbStatus === 'CONNECTED' ? 'bg-emerald-500' : dbStatus === 'OFFLINE' ? 'bg-amber-500' : 'bg-slate-400'}`} />
+                  {dbStatus === 'CONNECTED' ? t.databaseConnected : dbStatus === 'OFFLINE' ? t.databaseOffline : t.databaseChecking}
+                </span>
+              </section>
+
               {/* Top Stats Overview */}
               <StatsOverview batches={batches} auditLogs={auditLogs} lang={lang} />
 
@@ -601,98 +624,85 @@ export default function App() {
       {/* Toast Notification */}
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      {/* Professional Structured Footer */}
-      <footer className="border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md text-slate-600 dark:text-slate-400 mt-16 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          
-          {/* Main Footer Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-8 border-b border-slate-200/80 dark:border-slate-800/80">
-            
-            {/* Brand & Abstract (Col 1-5) */}
-            <div className="md:col-span-5 space-y-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 text-white flex items-center justify-center font-bold shadow-xs">
-                  <ShieldCheck className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-slate-900 dark:text-white text-base tracking-tight leading-none">
-                    QR TRACE
-                  </h3>
-                  <span className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-semibold">
-                    Digital Product Passport & Traceability
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Platform Paspor Produk Digital terintegrasi untuk ketertelusuran rantai pasok multi-tier, penjaminan mutu berbasis SOP, audit kriptografi SHA-256 terdesentralisasi, serta penghitungan jejak karbon ESG.
-              </p>
-
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>PostgreSQL System Ready</span>
-              </div>
-            </div>
-
-            {/* Core Features / Pillars (Col 6-8) */}
-            <div className="md:col-span-3 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
-                Fitur Utama
-              </h4>
-              <ul className="text-xs space-y-2 text-slate-500 dark:text-slate-400">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
-                  <span>Paspor Digital & QR Dinamis</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
-                  <span>Buku Besar Audit SHA-256</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
-                  <span>Pemeriksaan Mutu & SOP QC</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
-                  <span>Kalkulasi Emisi Karbon ESG</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Academic & Innovation Context (Col 9-12) */}
-            <div className="md:col-span-4 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
-                Konteks Inovasi
-              </h4>
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-1.5 text-xs">
-                <div className="font-semibold text-slate-800 dark:text-slate-200">
-                  iPEC '26 (Innovative Product Exhibition & Competition)
-                </div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Kolej Komuniti Temerloh & Universitas Teknologi Digital Indonesia
-                </div>
-                <div className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-medium pt-1">
-                  Kategori: Teknologi, Digital & Kelestarian
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Sub-footer / Bottom bar */}
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 dark:text-slate-500">
+      <section className="mx-auto mt-14 w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
+        <div className="flex flex-col gap-5 rounded-3xl bg-blue-50 p-5 dark:bg-blue-950/40 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+          <div className="flex items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-700 text-white shadow-sm">
+              <QrCode className="h-6 w-6" />
+            </span>
             <div>
-              © {new Date().getFullYear()} QR Trace. Hak Cipta Terpelihara.
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">{footerCopy.helpTitle}</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{footerCopy.helpDescription}</p>
             </div>
-            <div className="flex items-center gap-4 font-mono text-[10px]">
-              <span>ISO 22000</span>
-              <span>•</span>
-              <span>HACCP</span>
-              <span>•</span>
-              <span>EU DPP Standards</span>
+          </div>
+          <button
+            onClick={() => setIsQrScannerOpen(true)}
+            className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-100 bg-white px-5 text-sm font-semibold text-blue-700 shadow-sm transition hover:bg-blue-100 dark:border-blue-900 dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-slate-800 sm:w-auto"
+          >
+            <QrCode className="h-4 w-4" />
+            {footerCopy.openScanner}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </section>
+
+      <footer className="mt-10 w-full border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="mx-auto max-w-[1600px] px-4 pb-8 pt-10 sm:px-6 sm:pt-12 lg:px-8 xl:px-10 2xl:px-12">
+          <div className="grid grid-cols-1 gap-8 border-b border-slate-200 pb-8 dark:border-slate-800 sm:grid-cols-2 lg:grid-cols-5 lg:gap-10">
+            <div className="flex flex-col gap-4 sm:col-span-2 lg:col-span-2">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 text-white">
+                  <ShieldCheck className="h-5 w-5" />
+                </span>
+                <div>
+                  <h2 className="text-base font-bold tracking-tight text-slate-900 dark:text-white">QR Trace</h2>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-blue-700 dark:text-blue-300">{footerCopy.digitalPassport}</p>
+                </div>
+              </div>
+              <p className="max-w-md text-sm leading-6 text-slate-600 dark:text-slate-400">
+                {footerCopy.brandDescription}
+              </p>
+              <div className="inline-flex w-fit items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                <span className={`h-2 w-2 rounded-full ${dbStatus === 'CONNECTED' ? 'bg-emerald-500' : dbStatus === 'OFFLINE' ? 'bg-amber-500' : 'bg-slate-400'}`} />
+                {dbStatus === 'CONNECTED' ? footerCopy.systemConnected : dbStatus === 'OFFLINE' ? footerCopy.systemOffline : footerCopy.systemChecking}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700 dark:text-blue-300">{footerCopy.quickLinks}</h3>
+              <button onClick={() => setViewMode('landing')} className="w-fit text-left text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-300">{t.navHome}</button>
+              <button onClick={handleGoToDashboard} className="w-fit text-left text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-300">{t.navDashboard}</button>
+              <a href="#features" onClick={() => setViewMode('landing')} className="text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-300">{footerCopy.features}</a>
+              <a href="#public-products" onClick={() => setViewMode('landing')} className="text-sm text-slate-600 transition hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-300">{t.dashboard}</a>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700 dark:text-blue-300">{footerCopy.features}</h3>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{footerCopy.productPassport}</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{footerCopy.supplyChain}</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{footerCopy.audit}</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">{footerCopy.qualityCarbon}</span>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.12em] text-blue-700 dark:text-blue-300">{footerCopy.aboutProject}</h3>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">iPEC '26</p>
+              <p className="text-sm leading-5 text-slate-600 dark:text-slate-400">
+                {footerCopy.projectDescription}
+              </p>
+              <p className="text-xs leading-5 text-slate-500 dark:text-slate-500">
+                Kolej Komuniti Temerloh & Universitas Teknologi Digital Indonesia
+              </p>
             </div>
           </div>
 
+          <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-slate-50 px-4 py-4 text-xs text-slate-500 dark:bg-slate-800/70 dark:text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <p>© {new Date().getFullYear()} QR Trace. {footerCopy.copyright}</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span className="inline-flex items-center gap-1.5"><Database className="h-3.5 w-3.5" /> {footerCopy.secureData}</span>
+              <span className="inline-flex items-center gap-1.5"><Globe2 className="h-3.5 w-3.5" /> {footerCopy.digitalPassport}</span>
+            </div>
+          </div>
         </div>
       </footer>
 

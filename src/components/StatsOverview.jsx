@@ -1,12 +1,12 @@
-﻿import React from 'react';
-import { 
-  Package, 
-  ShieldCheck, 
-  FileCheck2, 
-  Layers, 
-  TrendingUp, 
-  CheckCircle2, 
-  Lock 
+import React from 'react';
+import {
+  Package,
+  ShieldCheck,
+  FileCheck2,
+  Layers,
+  TrendingUp,
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 import { TRANSLATIONS } from '../data/i18n';
 
@@ -14,114 +14,69 @@ export default function StatsOverview({ batches, auditLogs, lang = 'id' }) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS.id;
   const totalBatches = batches.length;
   const passedQcCount = batches.filter(b => (b.qcScore && b.qcScore >= 90) || (b.qcStatus && (b.qcStatus.includes('Lolos') || b.qcStatus.includes('Passed')))).length;
-  const avgQcScore = totalBatches > 0 
+  const avgQcScore = totalBatches > 0
     ? (batches.reduce((acc, b) => acc + (parseFloat(b.qcScore) || 98), 0) / totalBatches).toFixed(1)
     : '100';
   const totalLogs = auditLogs.length;
+  const stats = [
+    {
+      label: t.registeredBatches || 'Batch Terdaftar',
+      value: totalBatches,
+      caption: t.allActiveWithQr || 'Semua aktif dengan QR',
+      badge: <><TrendingUp className="h-3 w-3" /> 100%</>,
+      icon: <Package className="h-4 w-4" />,
+      iconColor: 'text-blue-600 bg-blue-50 dark:text-blue-300 dark:bg-blue-950/50'
+    },
+    {
+      label: t.qcCompliance || 'Kepatuhan Uji Mutu',
+      value: `${avgQcScore}%`,
+      caption: <><CheckCircle2 className="h-3 w-3 text-emerald-600" /> {passedQcCount} {t.passedStandard || 'batch lolos standar'}</>,
+      badge: 'Grade A',
+      icon: <ShieldCheck className="h-4 w-4" />,
+      iconColor: 'text-emerald-600 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/50'
+    },
+    {
+      label: t.qaAutomation || 'Validasi Otomatis (QA)',
+      value: '100%',
+      caption: <><Lock className="h-3 w-3" /> {t.humanInTheLoopReady}</>,
+      badge: 'SOP HACCP',
+      icon: <FileCheck2 className="h-4 w-4" />,
+      iconColor: 'text-indigo-600 bg-indigo-50 dark:text-indigo-300 dark:bg-indigo-950/50'
+    },
+    {
+      label: t.auditRecordsCount || 'Catatan Log Audit',
+      value: totalLogs,
+      caption: t.immutableLedger || 'Buku besar permanen',
+      badge: 'SHA-256',
+      icon: <Layers className="h-4 w-4" />,
+      iconColor: 'text-violet-600 bg-violet-50 dark:text-violet-300 dark:bg-violet-950/50'
+    }
+  ];
 
   return (
-    <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mb-6">
-      
-      {/* Stat 1: Total Batch Aktif */}
-      <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 opacity-80" />
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>{t.registeredBatches || 'Batch Terdaftar'}</span>
-          <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200/60 dark:border-teal-800/60 group-hover:scale-110 transition-transform">
-            <Package className="w-4 h-4" />
+    <section aria-label={t.statsLabel} className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+      {stats.map(stat => (
+        <article
+          key={stat.label}
+          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:p-5"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400">{stat.label}</h2>
+            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${stat.iconColor}`}>
+              {stat.icon}
+            </span>
           </div>
-        </div>
-        <div className="mt-2.5 flex items-baseline justify-between">
-          <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">
-              {totalBatches}
-            </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-              {t.allActiveWithQr || 'Semua aktif dengan QR'}
-            </p>
+          <div className="mt-3 flex items-end justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">{stat.value}</p>
+              <p className="mt-1 flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">{stat.caption}</p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              {stat.badge}
+            </span>
           </div>
-          <span className="text-[10px] font-semibold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 px-2 py-0.5 rounded-full flex items-center gap-0.5">
-            <TrendingUp className="w-2.5 h-2.5" /> 100%
-          </span>
-        </div>
-      </div>
-
-      {/* Stat 2: Kepatuhan Uji Mutu (QC) */}
-      <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-80" />
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>{t.qcCompliance || 'Kepatuhan Uji Mutu'}</span>
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/60 group-hover:scale-110 transition-transform">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-2.5 flex items-baseline justify-between">
-          <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
-              {avgQcScore}%
-            </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-              {passedQcCount} {t.passedStandard || 'batch lolos standar'}
-            </p>
-          </div>
-          <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
-            Grade A
-          </span>
-        </div>
-      </div>
-
-      {/* Stat 3: Validasi Otomatis QA & AI Copilot */}
-      <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-blue-500 opacity-80" />
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>{t.qaAutomation || 'Validasi Otomatis (QA)'}</span>
-          <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200/60 dark:border-indigo-800/60 group-hover:scale-110 transition-transform">
-            <FileCheck2 className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-2.5 flex items-baseline justify-between">
-          <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">
-              100%
-            </p>
-            <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-1 flex items-center gap-1">
-              <Lock className="w-3 h-3" />
-              Human-in-the-Loop siap
-            </p>
-          </div>
-          <span className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
-            SOP HACCP
-          </span>
-        </div>
-      </div>
-
-      {/* Stat 4: Catatan Log Audit / Ledger */}
-      <div className="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-4.5 shadow-xs hover:shadow-md card-hover transition-all overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-500 opacity-80" />
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <span>{t.auditRecordsCount || 'Catatan Log Audit'}</span>
-          <div className="w-8 h-8 rounded-xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-200/60 dark:border-violet-800/60 group-hover:scale-110 transition-transform">
-            <Layers className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-2.5 flex items-baseline justify-between">
-          <div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">
-              {totalLogs}
-            </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
-              {t.immutableLedger || 'Buku besar permanen'}
-            </p>
-          </div>
-          <span className="text-[10px] font-semibold text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 px-2 py-0.5 rounded-full">
-            SHA-256
-          </span>
-        </div>
-      </div>
-
+        </article>
+      ))}
     </section>
   );
 }
