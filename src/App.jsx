@@ -95,7 +95,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [lang, setLang] = useState('id'); // 'id' | 'ms' | 'en'
-  const [dbStatus, setDbStatus] = useState('CHECKING'); // 'CONNECTED' | 'OFFLINE'
   const [toast, setToast] = useState(null);
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -188,7 +187,6 @@ export default function App() {
     async function loadDbData() {
       const health = await api.checkHealth();
       if (health.status === 'OK') {
-        setDbStatus('CONNECTED');
         // Validasi sesi token user jika tersimpan
         if (api.getToken()) {
           const profile = await api.getMe();
@@ -211,8 +209,6 @@ export default function App() {
         if (dbLogs && dbLogs.length > 0) {
           setAuditLogs(dbLogs);
         }
-      } else {
-        setDbStatus('OFFLINE');
       }
 
       if (passportBatchNumber) {
@@ -561,7 +557,6 @@ export default function App() {
           onLogout={handleLogout}
           lang={lang}
           setLang={setLang}
-          dbStatus={dbStatus}
           theme={theme}
           setTheme={setTheme}
           auditLogCount={auditLogs.length}
@@ -581,7 +576,6 @@ export default function App() {
               onOpenScanner={() => setIsQrScannerOpen(true)}
               onSelectBatch={handleSelectBatch}
               onSimulateScan={handleSimulateScan}
-              dbStatus={dbStatus}
               lang={lang}
             />
           )}
@@ -601,14 +595,12 @@ export default function App() {
                     {t.dashboardDescription}
                   </p>
                 </div>
-                <span className={`inline-flex items-center gap-2 self-start rounded-full px-3 py-1.5 text-xs font-semibold sm:self-auto ${dbStatus === 'CONNECTED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : dbStatus === 'OFFLINE' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}>
-                  <span className={`h-2 w-2 rounded-full ${dbStatus === 'CONNECTED' ? 'bg-emerald-500' : dbStatus === 'OFFLINE' ? 'bg-amber-500' : 'bg-slate-400'}`} />
-                  {dbStatus === 'CONNECTED' ? t.databaseConnected : dbStatus === 'OFFLINE' ? t.databaseOffline : t.databaseChecking}
-                </span>
               </section>
 
               {/* Top Stats Overview */}
-              <StatsOverview batches={batches} auditLogs={auditLogs} lang={lang} />
+              {viewMode === 'catalog' && (
+                <StatsOverview batches={batches} auditLogs={auditLogs} lang={lang} />
+              )}
 
               {/* VIEW MODE 1: PRODUCT CATALOG DASHBOARD */}
               {viewMode === 'catalog' && (
@@ -750,10 +742,6 @@ export default function App() {
               <p className="max-w-md text-sm leading-6 text-slate-600 dark:text-slate-400">
                 {footerCopy.brandDescription}
               </p>
-              <div className="inline-flex w-fit items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <span className={`h-2 w-2 rounded-full ${dbStatus === 'CONNECTED' ? 'bg-emerald-500' : dbStatus === 'OFFLINE' ? 'bg-amber-500' : 'bg-slate-400'}`} />
-                {dbStatus === 'CONNECTED' ? footerCopy.systemConnected : dbStatus === 'OFFLINE' ? footerCopy.systemOffline : footerCopy.systemChecking}
-              </div>
             </div>
 
             <div className="flex flex-col gap-3">

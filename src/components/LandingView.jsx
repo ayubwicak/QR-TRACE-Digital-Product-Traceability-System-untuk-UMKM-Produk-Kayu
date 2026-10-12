@@ -14,7 +14,6 @@ import {
   ExternalLink,
   ChevronRight,
   Sparkles,
-  BarChart3,
   Lock,
   Globe2,
   Box,
@@ -31,7 +30,6 @@ export default function LandingView({
   onOpenScanner,
   onSelectBatch,
   onSimulateScan,
-  dbStatus = 'CHECKING',
   lang = 'id'
 }) {
   const [activeCategoryTab, setActiveCategoryTab] = useState('all');
@@ -376,21 +374,6 @@ export default function LandingView({
                 {copy.activityFallback}
               </article>
             )}
-          </div>
-          <div className="flex flex-col gap-3 rounded-2xl bg-blue-50/80 p-4 dark:bg-blue-950/30 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-            <div className="flex items-center gap-3">
-              <BarChart3 className="h-7 w-7 shrink-0 text-blue-700 dark:text-blue-300" />
-              <div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">{copy.systemStatus}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {dbStatus === 'CONNECTED' ? copy.databaseReady : dbStatus === 'OFFLINE' ? copy.databaseUnavailable : copy.databaseChecking}
-                </p>
-              </div>
-            </div>
-            <span className={`inline-flex items-center gap-2 self-start rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide sm:self-auto ${dbStatus === 'CONNECTED' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300' : dbStatus === 'OFFLINE' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}>
-              <span className={`h-2 w-2 rounded-full ${dbStatus === 'CONNECTED' ? 'bg-emerald-500' : dbStatus === 'OFFLINE' ? 'bg-amber-500' : 'bg-slate-400'}`} />
-              {dbStatus === 'CONNECTED' ? copy.normal : dbStatus === 'OFFLINE' ? copy.offline : copy.checking}
-            </span>
           </div>
         </div>
 

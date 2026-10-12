@@ -6,7 +6,6 @@ import {
   Plus, 
   Camera, 
   Globe, 
-  Database, 
   Sun, 
   Moon,
   LogIn,
@@ -29,7 +28,6 @@ export default function Navbar({
   onLogout,
   lang,
   setLang,
-  dbStatus,
   theme,
   setTheme,
   auditLogCount = 0

@@ -12,7 +12,7 @@ import {
   Edit3, 
   Trash2, 
   Award, 
-  Download, 
+  Eye,
   QrCode, 
   ArrowLeft, 
   MapPin
@@ -33,16 +33,6 @@ export default function BatchDetail({
   onRejectAiSuggestion 
 }) {
   if (!batch) return null;
-
-  const handleExportJson = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(batch, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `${batch.batchNumber}_digital_passport.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
 
   return (
     <div className="space-y-6">
@@ -73,11 +63,11 @@ export default function BatchDetail({
             <Leaf className="w-3.5 h-3.5 text-emerald-600" /> Kalkulator Emisi
           </button>
           <button
-            onClick={handleExportJson}
+            onClick={() => onSimulateScan(batch)}
             className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition text-xs font-medium flex items-center gap-1.5 border border-slate-200 shadow-2xs"
-            title="Unduh Paspor JSON"
+            title="Lihat pratinjau paspor yang dibagikan kepada pembeli"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" /> JSON
+            <Eye className="w-3.5 h-3.5 text-slate-500" /> Pratinjau Paspor
           </button>
           <button
             onClick={() => onOpenEditBatch(batch)}
