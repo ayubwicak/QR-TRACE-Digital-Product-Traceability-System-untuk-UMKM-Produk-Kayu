@@ -117,7 +117,7 @@ export default function App() {
 
   const handleGoToDashboard = () => {
     if (!currentUser) {
-      showToast('Login Diperlukan', 'Silakan masuk (login) terlebih dahulu untuk mengakses Dashboard.', 'info');
+      showToast('Akses Terbatas', 'Silakan masuk terlebih dahulu untuk mengakses Dashboard.', 'info');
       handleOpenLogin();
     } else {
       setViewMode('catalog');
@@ -126,7 +126,7 @@ export default function App() {
 
   const handleOpenNewBatchGuarded = () => {
     if (!currentUser) {
-      showToast('Login Diperlukan', 'Silakan masuk (login) terlebih dahulu untuk mendaftarkan batch baru.', 'info');
+      showToast('Akses Terbatas', 'Silakan masuk terlebih dahulu untuk mendaftarkan batch baru.', 'info');
       handleOpenLogin();
     } else {
       setIsNewBatchOpen(true);
@@ -138,7 +138,7 @@ export default function App() {
     setCurrentUser(null);
     localStorage.removeItem('qrtrace_user');
     setViewMode('landing');
-    showToast('Keluar dari Akun', 'Anda telah keluar dari sesi login.', 'info');
+    showToast('Keluar dari Akun', 'Anda telah keluar dari akun.', 'info');
   };
 
   // Initial Database Sync from PostgreSQL
@@ -441,14 +441,12 @@ export default function App() {
           </div>
         </header>
 
-        {/* Dedicated Mobile Screen Stage */}
-        <main className="flex-1 py-6 sm:py-10 px-3 sm:px-4 flex items-center justify-center">
-          <div className="w-full max-w-sm">
-            <ConsumerView 
-              batch={selectedBatch} 
-              onBackToAdmin={() => setViewMode('catalog')} 
-            />
-          </div>
+        {/* Full Desktop Consumer Passport View */}
+        <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-6xl w-full mx-auto">
+          <ConsumerView 
+            batch={selectedBatch} 
+            onBackToAdmin={() => setViewMode('catalog')} 
+          />
         </main>
 
         <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-200">

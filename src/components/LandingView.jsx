@@ -73,7 +73,7 @@ export default function LandingView({
               className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs transition flex items-center gap-2 shadow-xs cursor-pointer"
             >
               <LogIn className="w-4 h-4" />
-              <span>Masuk (Login)</span>
+              <span>Masuk</span>
             </button>
 
             <button
@@ -82,23 +82,6 @@ export default function LandingView({
             >
               <UserPlus className="w-4 h-4 text-slate-500" />
               <span>Daftar Akun Baru</span>
-            </button>
-
-            <button
-              onClick={onGoToDashboard}
-              className="px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-teal-700 dark:text-teal-400 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Layers className="w-4 h-4" />
-              <span>Dashboard Utama</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              onClick={onOpenScanner}
-              className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Camera className="w-4 h-4 text-slate-500" />
-              <span>Pindai QR</span>
             </button>
           </div>
 

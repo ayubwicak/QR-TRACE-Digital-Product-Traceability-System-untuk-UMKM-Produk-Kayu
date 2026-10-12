@@ -210,25 +210,25 @@ export default function AuthModal({
           <div className="grid grid-cols-2 gap-1 bg-slate-800 p-1 rounded-xl mt-4">
             <button
               onClick={() => { setMode('login'); setErrorMsg(''); }}
-              className={`py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
+              className={`py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 mode === 'login' 
                   ? 'bg-white text-slate-900 shadow-xs' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Masuk (Login)</span>
+              <span>Masuk</span>
             </button>
             <button
               onClick={() => { setMode('register'); setErrorMsg(''); }}
-              className={`py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 ${
+              className={`py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 mode === 'register' 
                   ? 'bg-white text-slate-900 shadow-xs' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <UserPlus className="w-3.5 h-3.5" />
-              <span>Daftar (Register)</span>
+              <span>Daftar</span>
             </button>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function AuthModal({
               {/* Demo Quick Login Helper */}
               <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2">
-                  Akses Cepat Pengujian (Demo):
+                  Pilih Akun Demo:
                 </div>
 
                 <div className="space-y-1.5">
@@ -278,7 +278,7 @@ export default function AuthModal({
               <form onSubmit={handleLoginSubmit} className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Email
+                    Alamat Email
                   </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -286,7 +286,7 @@ export default function AuthModal({
                       type="email"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="contoh: faiz@kktagrofarm.id"
+                      placeholder="Masukkan alamat email"
                       className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                     />
                   </div>
@@ -302,7 +302,7 @@ export default function AuthModal({
                       type="password"
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="••••••••"
+                      placeholder="Masukkan kata sandi"
                       className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                     />
                   </div>
@@ -320,7 +320,7 @@ export default function AuthModal({
                     <option value="Petugas QC">Petugas QC</option>
                     <option value="Auditor ESG & Karbon">Auditor ESG</option>
                     <option value="Admin Rantai Pasok">Admin Rantai Pasok</option>
-                    <option value="Konsumen / Publik">Konsumen / Publik</option>
+                    <option value="Konsumen / Publik">Konsumen</option>
                   </select>
                 </div>
 
@@ -353,7 +353,7 @@ export default function AuthModal({
                     type="text"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
-                    placeholder="Nama lengkap"
+                    placeholder="Masukkan nama lengkap"
                     className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                   />
                 </div>
@@ -361,7 +361,7 @@ export default function AuthModal({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Email *
+                  Alamat Email *
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -369,7 +369,7 @@ export default function AuthModal({
                     type="email"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
-                    placeholder="Alamat email"
+                    placeholder="Masukkan alamat email"
                     className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                   />
                 </div>
@@ -378,7 +378,7 @@ export default function AuthModal({
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Perusahaan
+                    Organisasi / Perusahaan
                   </label>
                   <div className="relative">
                     <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -386,7 +386,7 @@ export default function AuthModal({
                       type="text"
                       value={regOrg}
                       onChange={(e) => setRegOrg(e.target.value)}
-                      placeholder="KKT AgroFarm"
+                      placeholder="Nama instansi"
                       className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                     />
                   </div>
@@ -394,7 +394,7 @@ export default function AuthModal({
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Peran
+                    Peran Pengguna
                   </label>
                   <select
                     value={regRole}
@@ -420,7 +420,7 @@ export default function AuthModal({
                       type="password"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="Password"
+                      placeholder="Minimal 6 karakter"
                       className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                     />
                   </div>
@@ -428,7 +428,7 @@ export default function AuthModal({
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Konfirmasi *
+                    Ulangi Kata Sandi *
                   </label>
                   <div className="relative">
                     <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -436,7 +436,7 @@ export default function AuthModal({
                       type="password"
                       value={regConfirmPassword}
                       onChange={(e) => setRegConfirmPassword(e.target.value)}
-                      placeholder="Ulangi"
+                      placeholder="Ulangi kata sandi"
                       className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                     />
                   </div>
@@ -453,7 +453,7 @@ export default function AuthModal({
                 ) : (
                   <UserPlus className="w-4 h-4" />
                 )}
-                <span>{loading ? 'Mendaftarkan...' : 'Daftar Akun'}</span>
+                <span>{loading ? 'Memproses...' : 'Daftar Akun'}</span>
               </button>
             </form>
           )}
