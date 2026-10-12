@@ -1,7 +1,7 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
-import { INITIAL_BATCHES, INITIAL_AUDIT_LOGS } from '../src/data/mockData.js';
+import { ADDITIONAL_WOOD_BATCHES, INITIAL_BATCHES, INITIAL_AUDIT_LOGS } from '../src/data/mockData.js';
 
 dotenv.config();
 
@@ -300,6 +300,24 @@ export async function initDb() {
         b.qcInspector, b.carbonFootprint, b.carbonRating,
         b.verificationHash, b.story, JSON.stringify(b.materials),
         JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis), legacySampleNames
+      ]);
+    }
+
+    for (const b of ADDITIONAL_WOOD_BATCHES) {
+      await client.query(`
+        INSERT INTO qrtrace.batches (
+          batch_number, product_name, brand, sku, category,
+          manufacture_date, expiry_date, qc_status, qc_score,
+          qc_inspector, carbon_footprint, carbon_rating,
+          verification_hash, story, materials, timeline, ai_analysis
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        ON CONFLICT (batch_number) DO NOTHING;
+      `, [
+        b.batchNumber, b.productName, b.brand, b.sku, b.category,
+        b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
+        b.qcInspector, b.carbonFootprint, b.carbonRating,
+        b.verificationHash, b.story, JSON.stringify(b.materials),
+        JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis)
       ]);
     }
 

@@ -1,4 +1,4 @@
-export const INITIAL_BATCHES = [
+const ORIGINAL_WOOD_BATCHES = [
   {
     batchNumber: 'BATCH-2026-X01',
     productName: 'Meja Kopi Kayu Jati Solid',
@@ -107,6 +107,224 @@ export const INITIAL_BATCHES = [
     }
   }
 ];
+
+const createWoodSampleBatch = ({
+  batchNumber,
+  productName,
+  category,
+  brand,
+  sku,
+  image,
+  manufactureDate,
+  warrantyEndDate,
+  qcStatus,
+  qcInspector,
+  qcScore,
+  carbonFootprint,
+  verificationHash,
+  story,
+  mainMaterial,
+  supportingMaterials,
+  process,
+  inspection,
+  recommendation
+}) => ({
+  batchNumber,
+  productName,
+  category,
+  brand,
+  sku,
+  image,
+  manufactureDate,
+  expiryDate: warrantyEndDate,
+  qcStatus,
+  qcInspector,
+  qcScore,
+  carbonFootprint,
+  carbonRating: 'Estimasi ilustratif — perlu data produksi terverifikasi',
+  verificationHash,
+  story,
+  materials: [mainMaterial, ...supportingMaterials],
+  timeline: [
+    {
+      step: 'Penerimaan kayu dan pemeriksaan dokumen',
+      date: process.dates[0],
+      operator: 'Petugas Penerimaan Bahan',
+      desc: `Jenis kayu, volume, pemasok, dan referensi dokumen dicatat untuk batch ${batchNumber}.`,
+      done: true
+    },
+    {
+      step: 'Pengolahan dan pembentukan komponen',
+      date: process.dates[1],
+      operator: 'Operator Produksi',
+      desc: process.description,
+      done: true
+    },
+    {
+      step: 'Perakitan dan finishing',
+      date: process.dates[2],
+      operator: 'Tim Pengrajin',
+      desc: 'Komponen dirakit, permukaan dirapikan, dan finishing diperiksa sesuai spesifikasi produk.',
+      done: true
+    },
+    {
+      step: 'Pemeriksaan akhir dan penerbitan QR',
+      date: manufactureDate,
+      operator: 'Petugas Kontrol Mutu',
+      desc: `${inspection} Produk diperiksa sebelum paspor QR diterbitkan.`,
+      done: true
+    }
+  ],
+  aiAnalysis: {
+    confidenceScore: qcScore,
+    riskLevel: 'PERLU_PERHATIAN',
+    ruleChecked: 'Kelengkapan catatan asal bahan, proses, dan pemeriksaan',
+    anomalyDetected: false,
+    summary: `Data contoh ${productName}; dokumen pemasok dan hasil pemeriksaan tetap perlu diverifikasi oleh UMKM.`,
+    ecoScoreRecommendation: recommendation
+  }
+});
+
+export const ADDITIONAL_WOOD_BATCHES = [
+  createWoodSampleBatch({
+    batchNumber: 'BATCH-2026-L04',
+    productName: 'Lemari Pakaian Kayu Jati Dua Pintu',
+    category: 'Furnitur Kayu',
+    brand: 'Jepara Kayu Karya',
+    sku: 'JKK-LPJ-004',
+    image: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=600&q=80',
+    manufactureDate: '2026-10-06',
+    warrantyEndDate: '2028-10-06',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
+    qcInspector: 'Dian Prasetyo (Petugas Kontrol Mutu)',
+    qcScore: 96.8,
+    carbonFootprint: '24.6 kg CO₂e / unit (estimasi contoh)',
+    verificationHash: '0xa12c77e49f314ab682e0d5c29bc8f471',
+    story: 'Lemari dua pintu dibuat oleh bengkel furnitur skala UMKM. Paspor produk menghubungkan catatan kayu jati, proses pembuatan panel dan rangka, pemeriksaan pintu, serta panduan perawatan.',
+    mainMaterial: { name: 'Kayu jati gergajian, 0,42 m³', origin: 'Jepara, Jawa Tengah', supplier: 'Koperasi Kayu Jepara Sejahtera', batchRef: 'JPR-JTI-26091 / dokumen pemasok', verified: false },
+    supportingMaterials: [
+      { name: 'Plywood untuk panel belakang', origin: 'Kudus, Jawa Tengah', supplier: 'Mitra Panel Nusantara', batchRef: 'PNL-26088', verified: false },
+      { name: 'Engsel dan tarikan logam', origin: 'Pemasok komponen furnitur', supplier: 'Aksesori Perabot Jaya', batchRef: 'AKS-ENG-441', verified: false }
+    ],
+    process: {
+      dates: ['02 Okt 2026', '03 Okt 2026', '05 Okt 2026'],
+      description: 'Kayu dipotong untuk rangka dan panel, lalu ukuran komponen dicocokkan dengan gambar kerja.'
+    },
+    inspection: 'Kesikuan rangka, celah pintu, kekuatan engsel, dan kerataan lapisan permukaan diperiksa.',
+    recommendation: 'Verifikasi dokumen asal kayu dan catat volume kayu masuk, hasil jadi, serta sisa potongan.'
+  }),
+  createWoodSampleBatch({
+    batchNumber: 'BATCH-2026-R05',
+    productName: 'Rak Buku Kayu Pinus Lima Susun',
+    category: 'Furnitur Kayu',
+    brand: 'Ruang Kayu UMKM',
+    sku: 'RKU-RBP-005',
+    image: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=600&q=80',
+    manufactureDate: '2026-10-07',
+    warrantyEndDate: '2028-10-07',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
+    qcInspector: 'Rizky Ananda (Petugas Kontrol Mutu)',
+    qcScore: 97.2,
+    carbonFootprint: '9.3 kg CO₂e / unit (estimasi contoh)',
+    verificationHash: '0x6bd40e82735a41f09cba6e1481207f53',
+    story: 'Rak buku lima susun memanfaatkan papan pinus dari pemasok lokal. Catatan produksi mencakup identitas lot papan, pemotongan, kestabilan rak, dan pemeriksaan kapasitas sesuai spesifikasi bengkel.',
+    mainMaterial: { name: 'Papan kayu pinus, 0,16 m³', origin: 'Bandung, Jawa Barat', supplier: 'Pemasok Kayu Pinus Lestari', batchRef: 'PIN-BDG-26114 / nota pembelian', verified: false },
+    supportingMaterials: [
+      { name: 'Sekrup kayu dan bracket penguat', origin: 'Pemasok komponen lokal', supplier: 'Toko Teknik Sumber Rezeki', batchRef: 'KMP-SKR-208', verified: false },
+      { name: 'Finishing water-based transparan', origin: 'Pemasok bahan finishing', supplier: 'Warna Kayu Amanah', batchRef: 'FIN-WB-630', verified: false }
+    ],
+    process: {
+      dates: ['03 Okt 2026', '04 Okt 2026', '06 Okt 2026'],
+      description: 'Papan dipotong menjadi ambalan dan tiang, kemudian lubang sambungan dibor mengikuti ukuran rak.'
+    },
+    inspection: 'Kestabilan, kesamaan jarak ant ambalan, kekuatan sambungan, dan kondisi finishing diperiksa.',
+    recommendation: 'Tambahkan catatan kadar air kayu saat diterima dan hasil uji beban berdasarkan prosedur internal.'
+  }),
+  createWoodSampleBatch({
+    batchNumber: 'BATCH-2026-B06',
+    productName: 'Bangku Taman Kayu Ulin',
+    category: 'Furnitur Kayu',
+    brand: 'Bengkel Kayu Borneo',
+    sku: 'BKB-BTU-006',
+    image: 'https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?auto=format&fit=crop&w=600&q=80',
+    manufactureDate: '2026-10-08',
+    warrantyEndDate: '2028-10-08',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
+    qcInspector: 'Maya Lestari (Inspektur Produk)',
+    qcScore: 95.9,
+    carbonFootprint: '16.2 kg CO₂e / unit (estimasi contoh)',
+    verificationHash: '0x954e210bd7634a8fac10927e65b8d341',
+    story: 'Bangku taman dirakit oleh bengkel kayu lokal dengan perhatian pada kekuatan rangka dan permukaan yang nyaman. Informasi spesies, pemasok, dokumen bahan, serta pemeriksaan akhir dicatat untuk ditinjau.',
+    mainMaterial: { name: 'Kayu ulin untuk rangka dan dudukan, 0,21 m³', origin: 'Kalimantan Timur (asal pemasok perlu diverifikasi)', supplier: 'Mitra Kayu Borneo', batchRef: 'ULN-KTM-26042 / dokumen asal belum ditinjau', verified: false },
+    supportingMaterials: [
+      { name: 'Baut galvanis untuk sambungan', origin: 'Pemasok komponen logam', supplier: 'Teknik Borneo Mandiri', batchRef: 'BTR-GVN-723', verified: false },
+      { name: 'Pelapis pelindung eksterior', origin: 'Pemasok finishing lokal', supplier: 'Finishing Tahan Cuaca', batchRef: 'FIN-EXT-155', verified: false }
+    ],
+    process: {
+      dates: ['04 Okt 2026', '05 Okt 2026', '07 Okt 2026'],
+      description: 'Komponen rangka dan dudukan dipotong, lubang baut disiapkan, lalu dirakit dan dirapikan untuk penggunaan luar ruang.'
+    },
+    inspection: 'Kekokohan rangka, kekencangan baut, tepi tajam, dan cakupan pelapis diperiksa.',
+    recommendation: 'Tinjau dokumen legalitas dan asal kayu sebelum mengubah status bahan menjadi terverifikasi.'
+  }),
+  createWoodSampleBatch({
+    batchNumber: 'BATCH-2026-L07',
+    productName: 'Lampu Meja Kayu Mahoni',
+    category: 'Kerajinan Kayu',
+    brand: 'Kriya Mahoni Studio',
+    sku: 'KMS-LMK-007',
+    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=600&q=80',
+    manufactureDate: '2026-10-09',
+    warrantyEndDate: '2027-10-09',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
+    qcInspector: 'Fajar Nugraha (Petugas Kontrol Mutu)',
+    qcScore: 98.0,
+    carbonFootprint: '3.1 kg CO₂e / unit (estimasi contoh)',
+    verificationHash: '0x0ac563e2b814497fb37d1906d4518a2c',
+    story: 'Lampu meja dibuat dengan kaki kayu mahoni hasil bubut dan dirakit bersama komponen listrik dari pemasok terpisah. Paspor QR membedakan asal kayu dan komponen pendukung serta memuat informasi pemeriksaan produk.',
+    mainMaterial: { name: 'Balok kayu mahoni, 0,025 m³', origin: 'Kendal, Jawa Tengah', supplier: 'Sentra Kayu Mahoni Kendal', batchRef: 'MHN-KDL-26073 / nota pemasok', verified: false },
+    supportingMaterials: [
+      { name: 'Kabel, fitting, dan sakelar lampu', origin: 'Pemasok komponen listrik', supplier: 'Elektrik Terang Jaya', batchRef: 'ELK-LMP-099', verified: false },
+      { name: 'Lapisan minyak kayu', origin: 'Pemasok finishing', supplier: 'Finishing Aman Nusantara', batchRef: 'FIN-MHN-118', verified: false }
+    ],
+    process: {
+      dates: ['05 Okt 2026', '06 Okt 2026', '08 Okt 2026'],
+      description: 'Mahoni dibubut untuk membentuk kaki lampu, diamplas bertahap, lalu disiapkan untuk pemasangan komponen listrik.'
+    },
+    inspection: 'Kestabilan dudukan, kehalusan permukaan, pemasangan kabel, dan fungsi sakelar diperiksa.',
+    recommendation: 'Simpan informasi pemasok komponen listrik serta catatan pemeriksaan keselamatan produk sesuai ketentuan yang berlaku.'
+  }),
+  createWoodSampleBatch({
+    batchNumber: 'BATCH-2026-K08',
+    productName: 'Kotak Penyimpanan Kayu Sungkai',
+    category: 'Kerajinan Kayu',
+    brand: 'Kriya Sungkai Lokal',
+    sku: 'KSL-KPS-008',
+    image: 'https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=600&q=80',
+    manufactureDate: '2026-10-10',
+    warrantyEndDate: '2027-10-10',
+    qcStatus: 'Lolos Pemeriksaan Mutu (Grade A)',
+    qcInspector: 'Nadia Putri (Inspektur Produk)',
+    qcScore: 96.4,
+    carbonFootprint: '2.4 kg CO₂e / unit (estimasi contoh)',
+    verificationHash: '0x73f5a201b68d4c97a28e1f034bd569ca',
+    story: 'Kotak penyimpanan dibuat dari papan sungkai dengan sambungan sudut sederhana. Data lot bahan, proses perakitan, hasil pemeriksaan tutup, dan petunjuk perawatan disediakan sebagai contoh paspor produk UMKM.',
+    mainMaterial: { name: 'Papan kayu sungkai, 0,035 m³', origin: 'Sumatera Selatan', supplier: 'Pemasok Kayu Sungkai Setempat', batchRef: 'SKG-SUM-26102 / nota pembelian', verified: false },
+    supportingMaterials: [
+      { name: 'Engsel kecil dan kait penutup', origin: 'Pemasok aksesori kerajinan', supplier: 'Aksesori Kriya Mandiri', batchRef: 'AKS-KOT-064', verified: false },
+      { name: 'Perekat kayu dan finishing bening', origin: 'Pemasok bahan pertukangan', supplier: 'Bahan Kriya Sejahtera', batchRef: 'BKS-CLR-311', verified: false }
+    ],
+    process: {
+      dates: ['06 Okt 2026', '07 Okt 2026', '09 Okt 2026'],
+      description: 'Papan dipotong menjadi sisi kotak dan tutup, kemudian disambung, diamplas, dan dipasangi engsel.'
+    },
+    inspection: 'Kesikuan kotak, kelancaran tutup, kerapian sambungan, dan permukaan finishing diperiksa.',
+    recommendation: 'Catat pemanfaatan sisa potongan dan berikan instruksi perawatan agar produk bertahan lebih lama.'
+  })
+];
+
+export const ADDITIONAL_WOOD_BATCH_NUMBERS = ADDITIONAL_WOOD_BATCHES.map(batch => batch.batchNumber);
+export const INITIAL_BATCHES = [...ORIGINAL_WOOD_BATCHES, ...ADDITIONAL_WOOD_BATCHES];
 
 export const WOOD_CATEGORY_ALIASES = {
   materials: ['kayu olahan', 'komponen kayu', 'processed wood', 'wood components'],

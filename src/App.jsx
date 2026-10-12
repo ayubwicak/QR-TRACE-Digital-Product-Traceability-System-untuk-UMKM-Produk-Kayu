@@ -15,7 +15,7 @@ import QrScannerModal from './components/QrScannerModal';
 import EcoCalculatorModal from './components/EcoCalculatorModal';
 import CertificateModal from './components/CertificateModal';
 import Toast from './components/Toast';
-import { INITIAL_BATCHES, INITIAL_AUDIT_LOGS } from './data/mockData';
+import { ADDITIONAL_WOOD_BATCHES, INITIAL_BATCHES, INITIAL_AUDIT_LOGS } from './data/mockData';
 import { TRANSLATIONS } from './data/i18n';
 import { api } from './api';
 import confetti from 'canvas-confetti';
@@ -36,13 +36,24 @@ const LEGACY_SAMPLE_AUDIT_DETAILS = new Set([
 
 const loadBatches = () => {
   const saved = localStorage.getItem('qrtrace_batches');
-  if (!saved) return INITIAL_BATCHES;
+  if (!saved) {
+    localStorage.setItem('qrtrace_wood_samples_v1_migrated', 'true');
+    return INITIAL_BATCHES;
+  }
 
   const savedBatches = JSON.parse(saved);
-  return savedBatches.map(batch => {
+  const batches = savedBatches.map(batch => {
     if (!LEGACY_SAMPLE_NAMES.has(batch.productName)) return batch;
     return INITIAL_BATCHES.find(sample => sample.batchNumber === batch.batchNumber) || batch;
   });
+
+  if (localStorage.getItem('qrtrace_wood_samples_v1_migrated') !== 'true') {
+    const existingBatchNumbers = new Set(batches.map(batch => batch.batchNumber));
+    batches.push(...ADDITIONAL_WOOD_BATCHES.filter(batch => !existingBatchNumbers.has(batch.batchNumber)));
+    localStorage.setItem('qrtrace_wood_samples_v1_migrated', 'true');
+  }
+
+  return batches;
 };
 
 const loadAuditLogs = () => {
