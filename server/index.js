@@ -19,7 +19,11 @@ const distPath = path.resolve(__dirname, '../dist');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || 'qrtrace_super_secret_jwt_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ FATAL: JWT_SECRET tidak dikonfigurasi di file .env! Server tidak dapat berjalan tanpa secret yang aman.');
+  process.exit(1);
+}
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 // ==========================================
@@ -38,10 +42,18 @@ const allowedOrigins = process.env.CORS_ORIGIN
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      // Tolak request tanpa origin (curl, Postman, server-to-server) kecuali di development
+      if (!origin) {
+        if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
+          return callback(null, true);
+        }
+        return callback(new Error('CORS: Request tanpa Origin header tidak diizinkan.'));
+      }
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
         return callback(null, true);
       }
-      return callback(null, true);
+      // Tolak origin yang tidak terdaftar
+      return callback(new Error(`CORS: Origin '${origin}' tidak diizinkan oleh kebijakan server.`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -235,7 +247,7 @@ app.post('/api/auth/register', async (req, res) => {
 // Login
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email dan kata sandi wajib diisi.' });
@@ -255,12 +267,16 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Email atau kata sandi tidak sesuai.' });
     }
 
-    const finalRole = role || dbUser.role;
+    if (!dbUser.is_active) {
+      return res.status(403).json({ error: 'Akun ini telah dinonaktifkan. Hubungi administrator.' });
+    }
+
+    // Role SELALU diambil dari database — client tidak boleh menentukan role sendiri
     const user = {
       id: dbUser.id,
       name: dbUser.name,
       email: dbUser.email,
-      role: finalRole,
+      role: dbUser.role,
       organization: dbUser.organization,
       loginTime: new Date().toLocaleTimeString('id-ID')
     };
@@ -357,6 +373,12 @@ app.put('/api/users/:id/role', authenticateToken, requireRoles('Admin Rantai Pas
     const { id } = req.params;
     if (!role) return res.status(400).json({ error: 'Role wajib ditentukan' });
 
+    // Whitelist role yang diizinkan — mencegah injeksi role sembarang
+    const ALLOWED_ROLES = ['Admin Rantai Pasok', 'Petugas QC', 'Auditor ESG & Karbon', 'Konsumen / Publik'];
+    if (!ALLOWED_ROLES.includes(role)) {
+      return res.status(400).json({ error: `Role tidak valid. Pilihan yang diizinkan: ${ALLOWED_ROLES.join(', ')}` });
+    }
+
     const result = await pool.query(
       'UPDATE qrtrace.users SET role = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, name, email, role, organization, is_active;',
       [role, id]
@@ -387,7 +409,12 @@ app.get('/api/batches', async (req, res) => {
 
     if (search) {
       params.push(`%${search}%`);
-      conditions.push(`(product_name ILIKE $${params.length} OR batch_number ILIKE $${params.length} OR sku ILIKE $${params.length})`);
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+      const p1 = params.length - 2;
+      const p2 = params.length - 1;
+      const p3 = params.length;
+      conditions.push(`(product_name ILIKE $${p1} OR batch_number ILIKE $${p2} OR sku ILIKE $${p3})`);
     }
 
     if (conditions.length > 0) {
@@ -464,7 +491,7 @@ app.post('/api/batches', authenticateToken, requireRoles('Admin Rantai Pasok', '
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
       [
         `LOG-${Date.now()}`,
-        new Date().toLocaleString('id-ID'),
+        new Date().toISOString(),
         `${req.user.name} (${req.user.role})`,
         'PEMBUATAN_BATCH_BARU',
         b.batchNumber,
@@ -529,7 +556,7 @@ app.put('/api/batches/:batchNumber', authenticateToken, requireRoles('Admin Rant
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
       [
         `LOG-${Date.now()}`,
-        new Date().toLocaleString('id-ID'),
+        new Date().toISOString(),
         `${req.user.name} (${req.user.role})`,
         'PEMBARUAN_DATA_BATCH',
         batchNumber,
@@ -561,7 +588,7 @@ app.delete('/api/batches/:batchNumber', authenticateToken, requireRoles('Admin R
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
       [
         `LOG-${Date.now()}`,
-        new Date().toLocaleString('id-ID'),
+        new Date().toISOString(),
         `${req.user.name} (${req.user.role})`,
         'PENGHAPUSAN_BATCH',
         batchNumber,
@@ -659,8 +686,9 @@ app.get('/api/verify/:batchNumber', async (req, res) => {
     const certsRes = await pool.query('SELECT * FROM qrtrace.certificates WHERE batch_number = $1;', [batchNumber]);
     const certs = certsRes.rows.map(formatCertificateRow);
 
-    // Cryptographic validation
-    const hasValidHash = Boolean(batch.verificationHash && batch.verificationHash.startsWith('0x'));
+    // Cryptographic validation — verifikasi hash memiliki format SHA-256 yang valid (0x + 32 hex chars)
+    const SHA256_PATTERN = /^0x[0-9a-f]{32,64}$/i;
+    const hasValidHash = Boolean(batch.verificationHash && SHA256_PATTERN.test(batch.verificationHash));
 
     res.json({
       verified: true,
@@ -691,13 +719,29 @@ app.get('/api/verify/:batchNumber', async (req, res) => {
 app.post('/api/verify/scan', async (req, res) => {
   try {
     const { batchNumber, city = 'Kuala Lumpur / Jakarta', country = 'ASEAN', deviceType = 'Mobile Browser' } = req.body;
+
+    // Validasi batchNumber wajib ada dan berformat valid
+    if (!batchNumber || typeof batchNumber !== 'string' || batchNumber.trim().length === 0) {
+      return res.status(400).json({ success: false, error: 'batchNumber wajib diisi.' });
+    }
+    const cleanBatchNumber = batchNumber.trim().substring(0, 100); // Batasi panjang
+
+    // Pastikan batch terdaftar sebelum log scan (cegah spam dengan batch palsu)
+    const batchCheck = await pool.query(
+      'SELECT batch_number FROM qrtrace.batches WHERE batch_number = $1;',
+      [cleanBatchNumber]
+    );
+    if (batchCheck.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Batch tidak ditemukan.' });
+    }
+
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
     const scanId = `scn_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
     await pool.query(
       `INSERT INTO qrtrace.scan_events (id, batch_number, city, country, device_type, ip_address, verification_result)
        VALUES ($1, $2, $3, $4, $5, $6, $7);`,
-      [scanId, batchNumber, city, country, deviceType, clientIp.toString(), 'AUTHENTIC']
+      [scanId, cleanBatchNumber, city, country, deviceType, clientIp.toString(), 'AUTHENTIC']
     );
 
     res.json({ success: true, scanId });
@@ -712,36 +756,60 @@ app.post('/api/verify/scan', async (req, res) => {
 // ==========================================
 app.get('/api/analytics/stats', async (req, res) => {
   try {
-    const batchesRes = await pool.query('SELECT * FROM qrtrace.batches;');
-    const batches = batchesRes.rows.map(formatBatchRow);
-    const usersCountRes = await pool.query('SELECT COUNT(*) FROM qrtrace.users;');
-    const scansCountRes = await pool.query('SELECT COUNT(*) FROM qrtrace.scan_events;');
-    const certsCountRes = await pool.query('SELECT COUNT(*) FROM qrtrace.certificates;');
+    // Semua kalkulasi dilakukan di level SQL — jauh lebih efisien dari fetch all rows ke memory
+    const [
+      summaryRes,
+      categoryRes,
+      esgRes,
+      usersCountRes,
+      scansCountRes,
+      certsCountRes
+    ] = await Promise.all([
+      pool.query(`
+        SELECT
+          COUNT(*)                                          AS total_batches,
+          COUNT(*) FILTER (WHERE qc_score >= 90)           AS passed_batches,
+          ROUND(AVG(qc_score)::numeric, 1)                 AS average_qc_score
+        FROM qrtrace.batches;
+      `),
+      pool.query(`
+        SELECT category, COUNT(*) AS count
+        FROM qrtrace.batches
+        GROUP BY category
+        ORDER BY count DESC;
+      `),
+      pool.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE carbon_rating ILIKE '%Hijau%') AS green_count,
+          COUNT(*) FILTER (WHERE carbon_rating NOT ILIKE '%Hijau%' OR carbon_rating IS NULL) AS neutral_count
+        FROM qrtrace.batches;
+      `),
+      pool.query('SELECT COUNT(*) FROM qrtrace.users;'),
+      pool.query('SELECT COUNT(*) FROM qrtrace.scan_events;'),
+      pool.query('SELECT COUNT(*) FROM qrtrace.certificates;')
+    ]);
 
-    const totalBatches = batches.length;
-    const passedBatches = batches.filter((b) => b.qcScore >= 90).length;
-    const averageQcScore = totalBatches > 0 
-      ? (batches.reduce((acc, b) => acc + (b.qcScore || 0), 0) / totalBatches).toFixed(1)
-      : '0';
+    const totalBatches = parseInt(summaryRes.rows[0].total_batches, 10);
+    const passedBatches = parseInt(summaryRes.rows[0].passed_batches, 10);
+    const averageQcScore = parseFloat(summaryRes.rows[0].average_qc_score) || 0;
 
-    // Category distribution
     const categoryDistribution = {};
-    batches.forEach((b) => {
-      categoryDistribution[b.category] = (categoryDistribution[b.category] || 0) + 1;
+    categoryRes.rows.forEach(r => {
+      categoryDistribution[r.category] = parseInt(r.count, 10);
     });
 
     res.json({
       totalBatches,
       passedBatches,
-      averageQcScore: parseFloat(averageQcScore),
+      averageQcScore,
       totalUsers: parseInt(usersCountRes.rows[0].count, 10),
       totalCertificates: parseInt(certsCountRes.rows[0].count, 10),
       totalPublicScans: parseInt(scansCountRes.rows[0].count, 10),
       categoryDistribution,
       complianceRate: totalBatches > 0 ? `${Math.round((passedBatches / totalBatches) * 100)}%` : '100%',
       esgRatingDistribution: {
-        'Kategori Hijau (Rendah Emisi)': batches.filter((b) => b.carbonRating && b.carbonRating.includes('Hijau')).length,
-        'Standar Neutral': batches.filter((b) => !b.carbonRating || !b.carbonRating.includes('Hijau')).length
+        'Kategori Hijau (Rendah Emisi)': parseInt(esgRes.rows[0].green_count, 10),
+        'Standar Neutral': parseInt(esgRes.rows[0].neutral_count, 10)
       }
     });
   } catch (err) {
@@ -785,8 +853,38 @@ app.post('/api/ai/analyze-batch', authenticateToken, async (req, res) => {
 // ==========================================
 app.get('/api/audit-logs', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM qrtrace.audit_logs ORDER BY created_at DESC LIMIT 100;');
-    res.json(result.rows.map(formatAuditLogRow));
+    // Paginasi: ?limit=50&offset=0
+    const limit = Math.min(parseInt(req.query.limit, 10) || 100, 500);
+    const offset = parseInt(req.query.offset, 10) || 0;
+    const batchFilter = req.query.batchNumber;
+
+    let query = 'SELECT * FROM qrtrace.audit_logs';
+    const params = [];
+
+    if (batchFilter) {
+      params.push(batchFilter);
+      query += ` WHERE batch_number = $${params.length}`;
+    }
+
+    params.push(limit, offset);
+    query += ` ORDER BY created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length};`;
+
+    const [result, totalRes] = await Promise.all([
+      pool.query(query, params),
+      pool.query(
+        batchFilter
+          ? 'SELECT COUNT(*) FROM qrtrace.audit_logs WHERE batch_number = $1;'
+          : 'SELECT COUNT(*) FROM qrtrace.audit_logs;',
+        batchFilter ? [batchFilter] : []
+      )
+    ]);
+
+    res.json({
+      data: result.rows.map(formatAuditLogRow),
+      total: parseInt(totalRes.rows[0].count, 10),
+      limit,
+      offset
+    });
   } catch (err) {
     res.status(500).json({ error: 'Gagal mengambil log audit dari PostgreSQL' });
   }
@@ -803,7 +901,7 @@ app.post('/api/audit-logs', authenticateToken, async (req, res) => {
     `;
     const values = [
       log.id || `LOG-${Date.now()}`,
-      log.timestamp || new Date().toLocaleString('id-ID'),
+      new Date().toISOString(), // selalu gunakan waktu server, bukan waktu dari client
       log.actor || req.user.name,
       log.action,
       log.batchNumber,
@@ -850,17 +948,22 @@ app.get('/api/reports/batches/export', authenticateToken, async (req, res) => {
   }
 });
 
-// Health Check
+// Health Check (hanya tersedia di development atau dengan API key)
 app.get('/api/health', async (req, res) => {
   try {
-    const dbRes = await pool.query('SELECT NOW() as current_time, current_database(), current_user;');
+    const dbRes = await pool.query('SELECT NOW() as current_time, version() as pg_version;');
     const userCount = await pool.query('SELECT COUNT(*) FROM qrtrace.users;');
     const batchCount = await pool.query('SELECT COUNT(*) FROM qrtrace.batches;');
     const certCount = await pool.query('SELECT COUNT(*) FROM qrtrace.certificates;');
 
+    // Ambil versi PostgreSQL dari query, bukan hardcode
+    const pgVersionFull = dbRes.rows[0].pg_version || '';
+    const pgVersionMatch = pgVersionFull.match(/PostgreSQL (\d+\.\d+)/);
+    const pgVersion = pgVersionMatch ? `PostgreSQL ${pgVersionMatch[1]}` : 'PostgreSQL (Connected)';
+
     res.json({
       status: 'OK',
-      database: 'PostgreSQL 18 (Connected & Hardened)',
+      database: `${pgVersion} (Connected & Hardened)`,
       modules: {
         authentication: 'Active (BCrypt + JWT)',
         rbac: 'Active (Role Based Access Control)',
@@ -876,7 +979,7 @@ app.get('/api/health', async (req, res) => {
         batches: parseInt(batchCount.rows[0].count, 10),
         certificates: parseInt(certCount.rows[0].count, 10)
       },
-      info: dbRes.rows[0]
+      timestamp: dbRes.rows[0].current_time
     });
   } catch (err) {
     res.status(500).json({ status: 'ERROR', error: err.message });

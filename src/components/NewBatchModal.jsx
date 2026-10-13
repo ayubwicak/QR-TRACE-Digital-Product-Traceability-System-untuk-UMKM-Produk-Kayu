@@ -11,6 +11,18 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+function generateVerificationHash(batchNumber, productName, sku, manufactureDate) {
+  // Gunakan Web Crypto API untuk hash yang cryptographically secure
+  const payload = `${batchNumber}|${productName}|${sku}|${manufactureDate}|${Date.now()}`;
+  const encoder = new TextEncoder();
+  const data = encoder.encode(payload);
+  return crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return '0x' + hashHex.substring(0, 32);
+  });
+}
+
 export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatchCount }) {
   const fileInputRef = useRef(null);
   const [imageError, setImageError] = useState('');
@@ -85,9 +97,18 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const defaultFallbackImage = '/images/wood-batches/coffee-table.svg';
+
+    // Generate cryptographically secure verification hash
+    const verificationHash = await generateVerificationHash(
+      formData.batchNumber,
+      formData.productName,
+      formData.sku,
+      formData.manufactureDate
+    );
+
     const newBatchObj = {
       batchNumber: formData.batchNumber,
       productName: formData.productName,
@@ -102,7 +123,7 @@ export default function NewBatchModal({ isOpen, onClose, onAddBatch, currentBatc
       carbonFootprint: formData.carbonFootprint,
       carbonRating: formData.carbonRating,
       image: formData.image || defaultFallbackImage,
-      verificationHash: `0x${Math.random().toString(16).substring(2, 10)}${Math.random().toString(16).substring(2, 10)}`,
+      verificationHash,
       story: formData.story,
       materials: [
         {

@@ -341,16 +341,16 @@ export default function AiCopilotCard({
 
         <div className="flex items-center gap-1.5 flex-wrap text-[11px] text-slate-400 dark:text-slate-500">
           <span className="font-medium">Saran kueri:</span>
-          {quickPrompts.map((p, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => setCustomPrompt(p)}
-              className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md transition"
-            >
-              "{p}"
-            </button>
-          ))}
+{quickPrompts.map((p, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setCustomPrompt(p)}
+                className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md transition"
+              >
+                {p}
+              </button>
+            ))}
         </div>
       </div>
 

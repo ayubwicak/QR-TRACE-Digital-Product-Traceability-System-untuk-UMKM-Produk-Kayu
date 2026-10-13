@@ -26,11 +26,11 @@ export const api = {
   },
 
   // 2. Authentication & User Profile
-  async login(email, password, role) {
+  async login(email, password) {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Gagal login');
@@ -255,11 +255,15 @@ export const api = {
   },
 
   // 9. Audit Logs
-  async getAuditLogs() {
+  async getAuditLogs({ limit = 100, offset = 0, batchNumber } = {}) {
     try {
-      const res = await fetch(`${API_BASE}/audit-logs`, { signal: AbortSignal.timeout(3000) });
+      const params = new URLSearchParams({ limit, offset });
+      if (batchNumber) params.append('batchNumber', batchNumber);
+      const res = await fetch(`${API_BASE}/audit-logs?${params.toString()}`, { signal: AbortSignal.timeout(3000) });
       if (!res.ok) throw new Error('Gagal mengambil audit logs dari server PostgreSQL');
-      return await res.json();
+      const json = await res.json();
+      // Handle format baru ({ data, total, limit, offset }) maupun array lama
+      return Array.isArray(json) ? json : json.data;
     } catch (err) {
       console.warn('Gagal mengambil log dari PostgreSQL:', err.message);
       return null;

@@ -13,28 +13,53 @@ import { QRCodeSVG } from 'qrcode.react';
 import { api } from '../api';
 import { getBatchPassportUrl } from '../utils/passport';
 
-export default function ConsumerView({ batch, compactPreview = false, onBackToAdmin }) {
+export default function ConsumerView({ batch, compactPreview = false, onBackToAdmin, passportBatchNumber }) {
   const [activeTab, setActiveTab] = useState('materials');
   const [copied, setCopied] = useState(false);
 
+  // Hanya log scan jika diakses via passport publik (passportBatchNumber ada),
+  // BUKAN saat mode admin simulator (passportBatchNumber tidak ada)
   useEffect(() => {
-    if (batch?.batchNumber) {
+    if (batch?.batchNumber && passportBatchNumber) {
       api.logScan(batch.batchNumber, {
         deviceType: navigator.userAgent.includes('Mobile') ? 'Mobile Browser' : 'Desktop Browser'
       });
     }
-  }, [batch?.batchNumber]);
+  }, [batch?.batchNumber, passportBatchNumber]);
 
   if (!batch) return null;
 
   const checkedMaterialCount = batch.materials.filter(material => material.verified).length;
 
   const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
+    const url = window.location.href;
+    const copyToClipboard = (text) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      // Fallback untuk HTTP / non-secure context
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        return Promise.resolve();
+      } catch (err) {
+        return Promise.reject(err);
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    };
+
+    copyToClipboard(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    }
+    }).catch(() => {
+      alert('Gagal menyalin tautan. Silakan salin manual: ' + url);
+    });
   };
 
   if (compactPreview) {

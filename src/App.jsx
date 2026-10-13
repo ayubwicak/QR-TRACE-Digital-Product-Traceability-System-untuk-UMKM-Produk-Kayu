@@ -257,22 +257,19 @@ export default function App() {
       origin: { y: 0.6 }
     });
 
-    const newLog = {
-      id: `LOG-${1000 + auditLogs.length + 1}`,
-      timestamp: new Date().toLocaleString('id-ID'),
-      actor: currentUser ? `${currentUser.name} (${currentUser.role})` : 'Ahmad Faiz (Petugas QC)',
-      action: 'REGISTRASI_PRODUK_BARU',
-      batchNumber: newBatch.batchNumber,
-      details: `Registrasi batch baru ${newBatch.productName} (${newBatch.materials.length} komponen bahan baku diverifikasi).`,
-      status: 'TERCATAT',
-      hash: newBatch.verificationHash.substring(0, 14) + '...'
-    };
-    setAuditLogs([newLog, ...auditLogs]);
-
     showToast('Produk Baru Didaftarkan', `Batch ${newBatch.batchNumber} berhasil disimpan ke basis data.`);
 
-    await api.createBatch(newBatch);
-    await api.createAuditLog(newLog);
+    // Server otomatis mencatat audit log saat createBatch dipanggil
+    const savedBatch = await api.createBatch(newBatch);
+
+    // Sync state dengan data dari server (termasuk verificationHash yang dihitung server)
+    if (savedBatch && savedBatch.batchNumber) {
+      setBatches(prev => [savedBatch, ...prev.filter(b => b.batchNumber !== savedBatch.batchNumber)]);
+    }
+
+    // Refresh audit logs dari server
+    const dbLogs = await api.getAuditLogs();
+    if (dbLogs && dbLogs.length > 0) setAuditLogs(dbLogs);
   };
 
   // Handler: Save / Edit Batch
@@ -280,22 +277,14 @@ export default function App() {
     setBatches(batches.map(b => b.batchNumber === updatedBatch.batchNumber ? updatedBatch : b));
     setSelectedBatch(updatedBatch);
 
-    const newLog = {
-      id: `LOG-${1000 + auditLogs.length + 1}`,
-      timestamp: new Date().toLocaleString('id-ID'),
-      actor: currentUser ? `${currentUser.name} (${currentUser.role})` : 'Petugas Kontrol Mutu',
-      action: 'PEMBARUAN_DATA_PRODUK',
-      batchNumber: updatedBatch.batchNumber,
-      details: `Pembaruan rincian batch & rantai pasok (${updatedBatch.materials.length} bahan, ${updatedBatch.timeline.length} milestone).`,
-      status: 'TERVERIFIKASI',
-      hash: updatedBatch.verificationHash.substring(0, 14) + '...'
-    };
-    setAuditLogs([newLog, ...auditLogs]);
-
     showToast('Perubahan Disimpan', `Data batch ${updatedBatch.batchNumber} berhasil diperbarui.`);
 
+    // Server otomatis mencatat audit log saat updateBatch dipanggil
     await api.updateBatch(updatedBatch.batchNumber, updatedBatch);
-    await api.createAuditLog(newLog);
+
+    // Refresh audit logs dari server
+    const dbLogs = await api.getAuditLogs();
+    if (dbLogs && dbLogs.length > 0) setAuditLogs(dbLogs);
   };
 
   // Handler: Delete Batch
@@ -308,22 +297,14 @@ export default function App() {
       }
       setViewMode('catalog');
 
-      const newLog = {
-        id: `LOG-${1000 + auditLogs.length + 1}`,
-        timestamp: new Date().toLocaleString('id-ID'),
-        actor: currentUser ? currentUser.name : 'Admin Mutu',
-        action: 'PENGARSIPAN_BATCH',
-        batchNumber: batchNumber,
-        details: `Batch ${batchNumber} dihapus/diarsipkan dari daftar aktif.`,
-        status: 'TERARSIP',
-        hash: `0x${Math.random().toString(16).substring(2, 10)}...`
-      };
-      setAuditLogs([newLog, ...auditLogs]);
-
       showToast('Batch Dihapus', `Batch ${batchNumber} telah diarsipkan dari sistem.`, 'info');
 
+      // Server otomatis mencatat audit log saat deleteBatch dipanggil
       await api.deleteBatch(batchNumber);
-      await api.createAuditLog(newLog);
+
+      // Refresh audit logs dari server
+      const dbLogs = await api.getAuditLogs();
+      if (dbLogs && dbLogs.length > 0) setAuditLogs(dbLogs);
     }
   };
 
@@ -347,24 +328,15 @@ export default function App() {
       setSelectedBatch(updatedBatchObj);
     }
 
-    const newLog = {
-      id: `LOG-${1000 + auditLogs.length + 1}`,
-      timestamp: new Date().toLocaleString('id-ID'),
-      actor: currentUser ? `${currentUser.name} (${currentUser.role})` : 'Auditor Lingkungan (ESG)',
-      action: 'UPDATE_JEJAK_KARBON',
-      batchNumber: batchNumber,
-      details: `Pembaruan data jejak karbon: ${ecoData.carbonFootprint} (Rating ${ecoData.carbonRating}).`,
-      status: 'TERVERIFIKASI',
-      hash: `0x${Math.random().toString(16).substring(2, 10)}...`
-    };
-    setAuditLogs([newLog, ...auditLogs]);
-
     showToast('Rating Karbon Diperbarui', `Estimasi emisi baru diterapkan ke paspor produk.`);
 
     if (updatedBatchObj) {
       await api.updateBatch(batchNumber, updatedBatchObj);
     }
-    await api.createAuditLog(newLog);
+
+    // Refresh audit logs dari server
+    const dbLogs = await api.getAuditLogs();
+    if (dbLogs && dbLogs.length > 0) setAuditLogs(dbLogs);
   };
 
   // Handler: Approve AI Suggestion
@@ -386,41 +358,24 @@ export default function App() {
       setSelectedBatch(updatedBatchObj);
     }
 
-    const newLog = {
-      id: `LOG-${1000 + auditLogs.length + 1}`,
-      timestamp: new Date().toLocaleString('id-ID'),
-      actor: currentUser ? `${currentUser.name}` : 'Petugas QC Lapangan',
-      action: 'PERSETUJUAN_DRAF_NARASI',
-      batchNumber: batchNumber,
-      details: `Rekomendasi narasi disetujui & dimasukkan ke paspor digital: "${recommendationText}".`,
-      status: 'TERVERIFIKASI',
-      hash: `0x${Math.random().toString(16).substring(2, 10)}...`
-    };
-    setAuditLogs([newLog, ...auditLogs]);
-
     showToast('Rekomendasi Disetujui', 'Narasi transparansi telah dimasukkan ke paspor produk.');
 
     if (updatedBatchObj) {
       await api.updateBatch(batchNumber, updatedBatchObj);
     }
-    await api.createAuditLog(newLog);
+
+    // Refresh audit logs dari server
+    const dbLogs = await api.getAuditLogs();
+    if (dbLogs && dbLogs.length > 0) setAuditLogs(dbLogs);
   };
 
   // Handler: Reject AI Suggestion
   const handleRejectAiSuggestion = async (batchNumber) => {
-    const newLog = {
-      id: `LOG-${1000 + auditLogs.length + 1}`,
-      timestamp: new Date().toLocaleString('id-ID'),
-      actor: currentUser ? `${currentUser.name}` : 'Petugas QC Lapangan',
-      action: 'PENOLAKAN_DRAF_NARASI',
-      batchNumber: batchNumber,
-      details: `Rekomendasi narasi untuk batch ${batchNumber} ditolak oleh operator dan dibatalkan.`,
-      status: 'DITOLAK',
-      hash: `0x${Math.random().toString(16).substring(2, 10)}...`
-    };
-    setAuditLogs([newLog, ...auditLogs]);
     showToast('Rekomendasi Ditolak', 'Draf saran dibatalkan dari sistem.', 'info');
-    await api.createAuditLog(newLog);
+
+    // Refresh audit logs dari server (server otomatis log saat reject)
+    const dbLogs = await api.getAuditLogs();
+    if (dbLogs && dbLogs.length > 0) setAuditLogs(dbLogs);
   };
 
   // Handler: Simulate Consumer Scan
@@ -523,6 +478,7 @@ export default function App() {
               batch={selectedBatch}
               compactPreview={Boolean(passportBatchNumber)}
               onBackToAdmin={passportBatchNumber ? undefined : () => setViewMode('catalog')}
+              passportBatchNumber={passportBatchNumber}
             />
           )}
         </main>

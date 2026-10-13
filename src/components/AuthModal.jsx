@@ -14,28 +14,14 @@ import {
 } from 'lucide-react';
 import { api } from '../api';
 
-// Demo preset accounts
+// Demo preset accounts (only admin account)
 const DEMO_ACCOUNTS = [
   {
-    name: 'Ahmad Faiz',
-    email: 'faiz@qrtrace.id',
-    role: 'Petugas QC',
-    org: 'UMKM Produk Kayu',
-    password: 'password123'
-  },
-  {
-    name: 'Dr. Siti Nurhaliza',
-    email: 'siti.esg@auditor.org',
-    role: 'Auditor ESG & Karbon',
-    org: 'Lembaga Sertifikasi ESG',
-    password: 'password123'
-  },
-  {
-    name: 'Budi Santoso',
-    email: 'budi.admin@qrtrace.id',
+    name: 'Administrator',
+    email: 'admin@qrtrace.id',
     role: 'Admin Rantai Pasok',
     org: 'QR Trace System',
-    password: 'password123'
+    password: 'admin1234'
   }
 ];
 
@@ -52,13 +38,11 @@ export default function AuthModal({
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [loginRole, setLoginRole] = useState('Petugas QC');
 
   // Register form state
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regOrg, setRegOrg] = useState('UMKM Produk Kayu');
-  const [regRole, setRegRole] = useState('Petugas QC');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
 
@@ -70,21 +54,12 @@ export default function AuthModal({
     setErrorMsg('');
     setLoading(true);
     try {
-      // Coba otentikasi via backend JWT
-      const res = await api.login(account.email, account.password, account.role);
+      // Otentikasi via backend JWT — tidak ada fallback offline
+      const res = await api.login(account.email, account.password);
       onLoginSuccess(res.user);
       onClose();
-    } catch (_err) {
-      // Fallback offline simulator
-      const user = {
-        name: account.name,
-        email: account.email,
-        role: account.role,
-        organization: account.org,
-        loginTime: new Date().toLocaleTimeString('id-ID')
-      };
-      onLoginSuccess(user);
-      onClose();
+    } catch (err) {
+      setErrorMsg(err.message || 'Gagal terhubung ke server. Pastikan server berjalan.');
     } finally {
       setLoading(false);
     }
@@ -101,27 +76,11 @@ export default function AuthModal({
 
     setLoading(true);
     try {
-      const res = await api.login(loginEmail, loginPassword, loginRole);
+      const res = await api.login(loginEmail, loginPassword);
       onLoginSuccess(res.user);
       onClose();
     } catch (err) {
-      // Tampilkan error jika server aktif mengembalikan error, atau fallback jika offline
-      if (err.message && !err.message.includes('fetch') && !err.message.includes('NetworkError')) {
-        setErrorMsg(err.message);
-      } else {
-        // Fallback offline mode jika database belum start
-        const userName = loginEmail.split('@')[0] || 'Pengguna System';
-        const formattedName = userName.charAt(0).toUpperCase() + userName.slice(1);
-        const user = {
-          name: formattedName,
-          email: loginEmail,
-          role: loginRole,
-          organization: 'UMKM Produk Kayu',
-          loginTime: new Date().toLocaleTimeString('id-ID')
-        };
-        onLoginSuccess(user);
-        onClose();
-      }
+      setErrorMsg(err.message || 'Email atau kata sandi tidak sesuai.');
     } finally {
       setLoading(false);
     }
@@ -158,19 +117,7 @@ export default function AuthModal({
       onRegisterSuccess(res.user);
       onClose();
     } catch (err) {
-      if (err.message && !err.message.includes('fetch') && !err.message.includes('NetworkError')) {
-        setErrorMsg(err.message);
-      } else {
-        const user = {
-          name: regName,
-          email: regEmail,
-          role: regRole,
-          organization: regOrg,
-          loginTime: new Date().toLocaleTimeString('id-ID')
-        };
-        onRegisterSuccess(user);
-        onClose();
-      }
+      setErrorMsg(err.message || 'Gagal terhubung ke server. Pastikan server berjalan.');
     } finally {
       setLoading(false);
     }
@@ -308,22 +255,6 @@ export default function AuthModal({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Peran Pengguna
-                  </label>
-                  <select
-                    value={loginRole}
-                    onChange={(e) => setLoginRole(e.target.value)}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
-                  >
-                    <option value="Petugas QC">Petugas QC</option>
-                    <option value="Auditor ESG & Karbon">Auditor ESG</option>
-                    <option value="Admin Rantai Pasok">Admin Rantai Pasok</option>
-                    <option value="Konsumen / Publik">Konsumen</option>
-                  </select>
-                </div>
-
                 <button
                   type="submit"
                   disabled={loading}
@@ -370,9 +301,9 @@ export default function AuthModal({
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder="Masukkan alamat email"
-                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
-                  />
-                </div>
+className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
+                    />
+</div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
@@ -389,24 +320,8 @@ export default function AuthModal({
                       placeholder="Nama instansi"
                       className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-teal-500 text-slate-800 dark:text-slate-100"
                     />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Peran Pengguna
-                  </label>
-                  <select
-                    value={regRole}
-                    onChange={(e) => setRegRole(e.target.value)}
-                    className="w-full px-2.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-teal-500"
-                  >
-                    <option value="Petugas QC">Petugas QC</option>
-                    <option value="Auditor ESG & Karbon">Auditor ESG</option>
-                    <option value="Admin Rantai Pasok">Admin Rantai Pasok</option>
-                    <option value="Konsumen / Publik">Konsumen</option>
-                  </select>
-                </div>
+</div>
+              </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">

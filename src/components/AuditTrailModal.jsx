@@ -76,7 +76,12 @@ export default function AuditTrailModal({ isOpen, onClose, auditLogs }) {
                     <Hash className="w-3 h-3 text-slate-400" /> Block Hash: {log.hash}
                   </span>
                   <span className={`text-[10px] font-bold ${
-                    log.status === 'COMMITTED' ? 'text-emerald-700' : 'text-amber-700'
+                    log.status === 'TERVERIFIKASI' ? 'text-emerald-700'
+                    : log.status === 'PERINGATAN' ? 'text-amber-700'
+                    : log.status === 'TERCATAT' ? 'text-blue-700'
+                    : log.status === 'DITOLAK' ? 'text-rose-700'
+                    : log.status === 'TERARSIP' ? 'text-slate-700'
+                    : 'text-slate-700'
                   }`}>
                     • {log.status}
                   </span>

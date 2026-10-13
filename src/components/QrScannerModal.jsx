@@ -76,7 +76,11 @@ export default function QrScannerModal({ isOpen, onClose, batches, onBatchScanne
       origin: { y: 0.6 }
     });
 
-    const found = batches.find(b => text.includes(b.batchNumber)) || batches[0];
+    const found = batches.find(b => text.includes(b.batchNumber));
+    if (!found) {
+      alert('QR Code tidak valid atau batch tidak dikenali. Silakan coba lagi.');
+      return;
+    }
     onBatchScanned(found);
     onClose();
   };

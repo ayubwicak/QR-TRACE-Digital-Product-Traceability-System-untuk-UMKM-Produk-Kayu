@@ -23,10 +23,16 @@ export default function EcoCalculatorModal({ isOpen, onClose, batch, onUpdateEco
   
   let rating = 'A+';
   let colorClass = 'text-emerald-700 border-emerald-300 bg-emerald-50';
-  if (totalCO2 > 0.5) {
+  if (totalCO2 > 1.0) {
+    rating = 'D';
+    colorClass = 'text-rose-800 border-rose-300 bg-rose-50';
+  } else if (totalCO2 > 0.5) {
+    rating = 'C';
+    colorClass = 'text-orange-800 border-orange-300 bg-orange-50';
+  } else if (totalCO2 > 0.25) {
     rating = 'B';
     colorClass = 'text-amber-800 border-amber-300 bg-amber-50';
-  } else if (totalCO2 > 0.25) {
+  } else if (totalCO2 > 0.1) {
     rating = 'A';
     colorClass = 'text-teal-800 border-teal-300 bg-teal-50';
   }

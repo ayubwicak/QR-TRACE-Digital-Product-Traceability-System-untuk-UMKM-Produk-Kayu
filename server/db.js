@@ -7,35 +7,28 @@ dotenv.config();
 
 const { Pool } = pg;
 
+// SSL config: set DB_SSL=true di .env untuk koneksi PostgreSQL via SSL
+// DB_SSL_REJECT_UNAUTHORIZED=false hanya jika menggunakan self-signed cert (tidak disarankan production)
+const sslConfig = (() => {
+  if (process.env.DB_SSL !== 'true') return false;
+  return {
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
+  };
+})();
+
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/qrtrace',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: sslConfig
 });
 
 export const INITIAL_USERS = [
   {
     id: 'usr_admin_01',
-    name: 'Budi Santoso',
-    email: 'budi.admin@qrtrace.id',
-    password: 'password123',
+    name: 'Administrator',
+    email: 'admin@qrtrace.id',
+    password: 'admin1234',
     role: 'Admin Rantai Pasok',
     organization: 'QR Trace System'
-  },
-  {
-    id: 'usr_qc_01',
-    name: 'Ahmad Faiz',
-    email: 'faiz@qrtrace.id',
-    password: 'password123',
-    role: 'Petugas QC',
-    organization: 'UMKM Produk Kayu'
-  },
-  {
-    id: 'usr_auditor_01',
-    name: 'Dr. Siti Nurhaliza',
-    email: 'siti.esg@auditor.org',
-    password: 'password123',
-    role: 'Auditor ESG & Karbon',
-    organization: 'Lembaga Sertifikasi ESG'
   }
 ];
 
@@ -182,6 +175,7 @@ export async function initDb() {
       );
     `);
     await client.query(`ALTER TABLE qrtrace.batches ADD COLUMN IF NOT EXISTS image TEXT NOT NULL DEFAULT '';`);
+    await client.query(`ALTER TABLE qrtrace.users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;`);
 
     // 4. Buat Tabel Audit Logs
     await client.query(`
@@ -246,16 +240,8 @@ export async function initDb() {
       }
     }
 
-    await client.query(`
-      UPDATE qrtrace.users
-      SET organization = 'UMKM Produk Kayu'
-      WHERE organization = 'KKT AgroFarm';
-    `);
-    await client.query(`
-      UPDATE qrtrace.users
-      SET email = 'faiz@qrtrace.id'
-      WHERE id = 'usr_qc_01' AND email = 'faiz@kktagrofarm.id';
-    `);
+    // Legacy migration: jalankan sekali saja berdasarkan flag di DB
+    // (blok UPDATE/DELETE lama dihapus — data sudah termigrasikan ke semua environment yang ada)
 
     // 8. Seed initial data jika tabel batches masih kosong
     const countRes = await client.query(`SELECT COUNT(*) FROM qrtrace.batches;`);
@@ -279,63 +265,25 @@ export async function initDb() {
           JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis)
         ]);
       }
-    }
 
-    const legacySampleNames = [
-      'Kopi Robusta Temerloh Organik 250g',
-      'Sabun Herbal Minyak Atsiri Serai 100g',
-      'Madu Kelulut Asli Hutan Tropis 350g',
-      'Kripik',
-      'Pisang'
-    ];
-
-    for (const b of INITIAL_BATCHES) {
-      await client.query(`
-        UPDATE qrtrace.batches
-        SET product_name = $2, brand = $3, sku = $4, category = $5,
-            manufacture_date = $6, expiry_date = $7, qc_status = $8, qc_score = $9,
-            qc_inspector = $10, carbon_footprint = $11, carbon_rating = $12,
-            verification_hash = $13, story = $14, image = $15, materials = $16,
-            timeline = $17, ai_analysis = $18
-        WHERE batch_number = $1 AND (product_name = ANY($19::text[]) OR product_name = $2);
-      `, [
-        b.batchNumber, b.productName, b.brand, b.sku, b.category,
-        b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
-        b.qcInspector, b.carbonFootprint, b.carbonRating,
-        b.verificationHash, b.story, b.image || '', JSON.stringify(b.materials),
-        JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis), legacySampleNames
-      ]);
-    }
-
-    await client.query(`
-      DELETE FROM qrtrace.batches
-      WHERE (batch_number = 'BATCH-2026-N04' AND product_name = 'Kripik')
-         OR (batch_number = 'BATCH-2026-N05' AND product_name = 'Pisang');
-    `);
-    await client.query(`
-      DELETE FROM qrtrace.scan_events
-      WHERE batch_number = ANY($1::text[]);
-    `, [['BATCH-2026-N04', 'BATCH-2026-N05']]);
-
-    for (const b of ADDITIONAL_WOOD_BATCHES) {
-      await client.query(`
-        INSERT INTO qrtrace.batches (
-          batch_number, product_name, brand, sku, category,
-          manufacture_date, expiry_date, qc_status, qc_score,
-          qc_inspector, carbon_footprint, carbon_rating,
-          verification_hash, story, image, materials, timeline, ai_analysis
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-        ON CONFLICT (batch_number) DO UPDATE
-        SET image = EXCLUDED.image
-        WHERE qrtrace.batches.product_name = EXCLUDED.product_name
-          AND (qrtrace.batches.image IS NULL OR qrtrace.batches.image = '');
-      `, [
-        b.batchNumber, b.productName, b.brand, b.sku, b.category,
-        b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
-        b.qcInspector, b.carbonFootprint, b.carbonRating,
-        b.verificationHash, b.story, b.image || '', JSON.stringify(b.materials),
-        JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis)
-      ]);
+      // Seed ADDITIONAL_WOOD_BATCHES juga saat DB kosong
+      for (const b of ADDITIONAL_WOOD_BATCHES) {
+        await client.query(`
+          INSERT INTO qrtrace.batches (
+            batch_number, product_name, brand, sku, category,
+            manufacture_date, expiry_date, qc_status, qc_score,
+            qc_inspector, carbon_footprint, carbon_rating,
+            verification_hash, story, image, materials, timeline, ai_analysis
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+          ON CONFLICT (batch_number) DO NOTHING;
+        `, [
+          b.batchNumber, b.productName, b.brand, b.sku, b.category,
+          b.manufactureDate, b.expiryDate, b.qcStatus, b.qcScore,
+          b.qcInspector, b.carbonFootprint, b.carbonRating,
+          b.verificationHash, b.story, b.image || '', JSON.stringify(b.materials),
+          JSON.stringify(b.timeline), JSON.stringify(b.aiAnalysis)
+        ]);
+      }
     }
 
     // 9. Seed audit logs jika kosong
@@ -356,21 +304,6 @@ export async function initDb() {
       }
     }
 
-    const legacyAuditDetails = [
-      'Menyetujui rilis batch kopi setelah verifikasi hasil lab kadar air 11.2% dan uji aroma.',
-      'Pemeriksaan 4 tahapan produksi selesai. Parameter suhu dan kebersihan memenuhi standar ISO 22000.',
-      'Konfirmasi sertifikat analisis bahan VCO murni dari Koperasi Tani Makmur.',
-      'Perhitungan jejak karbon 0.28 kg CO₂e diverifikasi memenuhi standar kampus ramah lingkungan.'
-    ];
-
-    for (const log of INITIAL_AUDIT_LOGS) {
-      await client.query(`
-        UPDATE qrtrace.audit_logs
-        SET actor = $2, details = $3
-        WHERE id = $1 AND details = ANY($4::text[]);
-      `, [log.id, log.actor, log.details, legacyAuditDetails]);
-    }
-
     // 10. Seed certificates jika kosong
     const certCountRes = await client.query(`SELECT COUNT(*) FROM qrtrace.certificates;`);
     const certCount = parseInt(certCountRes.rows[0].count, 10);
@@ -388,28 +321,6 @@ export async function initDb() {
           c.issue_date, c.expiry_date, c.status, c.score, c.document_url, c.hash
         ]);
       }
-    }
-
-    const legacyCertificateTypes = [
-      'Certificate of Analysis (COA)',
-      'Sertifikat Halal Resmi',
-      'Kepatuhan Emisi Rendah & ESG',
-      'Sertifikasi Organik Alami'
-    ];
-
-    for (const certificate of INITIAL_CERTIFICATES) {
-      await client.query(`
-        UPDATE qrtrace.certificates
-        SET batch_number = $2, cert_type = $3, cert_number = $4, issuer = $5,
-            issue_date = $6, expiry_date = $7, status = $8, score = $9,
-            document_url = $10, hash = $11
-        WHERE id = $1 AND cert_type = ANY($12::text[]);
-      `, [
-        certificate.id, certificate.batch_number, certificate.cert_type,
-        certificate.cert_number, certificate.issuer, certificate.issue_date,
-        certificate.expiry_date, certificate.status, certificate.score,
-        certificate.document_url, certificate.hash, legacyCertificateTypes
-      ]);
     }
 
     // 11. Seed scan events jika kosong
